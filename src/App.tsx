@@ -61,6 +61,7 @@ export default function App() {
   const avgSyncLevel = Math.round(
     syncLevels.reduce((sum, level) => sum + level, 0) / Math.max(syncLevels.length, 1)
   );
+  const maxSyncLevel = Math.max(...syncLevels);
 
   const bestPercent = Math.min(...recentRaidResults.map((r) => r.percent));
   const visualPath = `${import.meta.env.BASE_URL}images/union-visual.png`;
@@ -217,10 +218,18 @@ export default function App() {
                   <h2 className="mt-2 text-2xl font-bold">シンクロレベル分布</h2>
                 </div>
 
-                <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-right">
-                  <div className="text-xs text-white/45">平均シンクロLv</div>
-                  <div className="text-xl font-bold">{avgSyncLevel}</div>
+              <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                <div className="grid grid-cols-2 gap-4 text-right">
+                  <div>
+                    <div className="text-xs text-white/45">平均シンクロLv</div>
+                    <div className="text-xl font-bold">{avgSyncLevel}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-white/45">最高シンクロLv</div>
+                    <div className="text-xl font-bold text-[#ffd38b]">{maxSyncLevel}</div>
+                  </div>
                 </div>
+              </div>
               </div>
 
               <div className="h-80 w-full">
