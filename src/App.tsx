@@ -302,12 +302,16 @@ export default function App() {
                 <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={levelDistribution} barCategoryGap={barCategoryGap}>
                     <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
-                    <XAxis
-                      dataKey="range"
-                      stroke="rgba(255,255,255,0.6)"
-                      tickLine={false}
-                      axisLine={false}
-                    />
+                      <XAxis
+                        dataKey="range"
+                        stroke="rgba(255,255,255,0.6)"
+                        tickLine={false}
+                        axisLine={false}
+                        interval={0}
+                        minTickGap={0}
+                        tick={{ fontSize: isMobile ? 9 : 12 }}
+                        tickMargin={8}
+                      />
                     <YAxis
                       stroke="rgba(255,255,255,0.6)"
                       tickLine={false}
