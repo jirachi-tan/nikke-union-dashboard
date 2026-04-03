@@ -158,16 +158,6 @@ export default function App() {
                       e.currentTarget.style.display = 'none';
                     }}
                   />
-                  <div className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_55%)] text-center">
-                    <div>
-                      <div className="text-sm font-semibold tracking-[0.18em] text-white/45">
-                        CHARACTER VISUAL AREA
-                      </div>
-                      <div className="mt-2 text-xs leading-5 text-white/40">
-                        public/images/union-visual.png を配置すると表示されます
-                      </div>
-                    </div>
-                  </div>
                   <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(9,11,17,0.08),rgba(9,11,17,0.18))]" />
                 </div>
               </div>
