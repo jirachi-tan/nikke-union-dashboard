@@ -57,6 +57,57 @@ const recentRaidResults = [
   { raid: "R8.3", percent: 1.51 },
 ];
 
+type RaidDotProps = {
+  cx?: number;
+  cy?: number;
+  payload?: { percent: number };
+};
+
+function CustomRaidDot({ cx, cy, payload }: RaidDotProps) {
+  if (cx == null || cy == null || !payload) return null;
+
+  const best = Math.min(...recentRaidResults.map((r) => r.percent));
+  const isBest = payload.percent === best;
+
+  if (isBest) {
+    const points = [
+      [0, -9],
+      [2.4, -3.2],
+      [8.6, -3.2],
+      [3.6, 0.8],
+      [5.5, 7.4],
+      [0, 3.2],
+      [-5.5, 7.4],
+      [-3.6, 0.8],
+      [-8.6, -3.2],
+      [-2.4, -3.2],
+    ]
+      .map(([x, y]) => `${cx + x},${cy + y}`)
+      .join(" ");
+
+    return (
+      <polygon
+        points={points}
+        fill="#ffd166"
+        stroke="#fff3bf"
+        strokeWidth={1.5}
+        style={{ filter: "drop-shadow(0 0 6px rgba(255, 209, 102, 0.45))" }}
+      />
+    );
+  }
+
+  return (
+    <circle
+      cx={cx}
+      cy={cy}
+      r={5}
+      fill="#ffffff"
+      stroke="rgba(103,232,249,0.95)"
+      strokeWidth={3}
+    />
+  );
+}
+
 export default function App() {
   const avgSyncLevel = Math.round(
     syncLevels.reduce((sum, level) => sum + level, 0) / Math.max(syncLevels.length, 1)
@@ -331,7 +382,7 @@ export default function App() {
                       dataKey="percent"
                       stroke="rgba(103,232,249,0.95)"
                       strokeWidth={3}
-                      dot={{ r: 4 }}
+                      dot={<CustomRaidDot />}
                     />
                   </LineChart>
                 </ResponsiveContainer>
