@@ -248,7 +248,7 @@ export default function App() {
                     <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4">
                       <div className="text-sm font-semibold text-white">協同作戦もユニオン内で実施</div>
                       <p className="mt-1 text-xs leading-5 text-white/62">
-                        Discordは22時頃に活動が多いです。VCもあります(チャット参加OK)。
+                        Discordでの協同作戦は22時頃が多いです。VCもあります(チャット参加OK)。
                       </p>
                     </div>
                     <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4">
