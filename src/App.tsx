@@ -165,6 +165,7 @@ export default function App() {
   const bestPercent = Math.min(...recentRaidResults.map((r) => r.percent));
   const latestPercent = recentRaidResults[recentRaidResults.length - 1].percent;
   const visualPath = `${import.meta.env.BASE_URL}images/union-visual.png`;
+  const mascotGifPath = `${import.meta.env.BASE_URL}images/union-mascot.gif`;
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -260,6 +261,15 @@ export default function App() {
                   </div>
                 </div>
               </div>
+                              <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-3">
+                  <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
+                    <img
+                      src={mascotGifPath}
+                      alt="ユニオンマスコットGIF"
+                      className="w-full object-cover"
+                    />
+                  </div>
+                </div>
             </div>
 
             <div className="flex min-h-full flex-col rounded-3xl border border-[#f6b44b]/15 bg-[linear-gradient(180deg,rgba(246,180,75,0.14),rgba(255,255,255,0.03))] p-5 sm:p-6">
