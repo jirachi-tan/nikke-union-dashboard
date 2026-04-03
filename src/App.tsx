@@ -82,6 +82,29 @@ function LevelAxisTick({ x, y, payload, isMobile }: LevelTickProps) {
   );
 }
 
+type RaidTickProps = {
+  x?: number;
+  y?: number;
+  payload?: { value: string };
+  isMobile: boolean;
+};
+
+function RaidAxisTick({ x, y, payload, isMobile }: RaidTickProps) {
+  if (x == null || y == null || !payload) return null;
+
+  return (
+    <text
+      x={x}
+      y={y + 16}
+      textAnchor="middle"
+      fill="rgba(255,255,255,0.6)"
+      fontSize={isMobile ? 11 : 14}
+    >
+      {payload.value}
+    </text>
+  );
+}
+
 type RaidDotProps = {
   cx?: number;
   cy?: number;
@@ -395,12 +418,11 @@ export default function App() {
                     <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
                       <XAxis
                         dataKey="raid"
-                        stroke="rgba(255,255,255,0.6)"
                         tickLine={false}
                         axisLine={false}
                         interval={0}
                         minTickGap={0}
-                        tick={{ fontSize: 11 }}
+                        tick={(props) => <RaidAxisTick {...props} isMobile={isMobile} />}
                         tickMargin={8}
                         padding={{ left: 8, right: 16 }}
                       />
