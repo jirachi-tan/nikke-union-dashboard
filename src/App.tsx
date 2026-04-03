@@ -70,6 +70,9 @@ export default function App() {
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,173,51,0.16),transparent_28%),radial-gradient(circle_at_top_right,rgba(56,189,248,0.12),transparent_25%),linear-gradient(to_bottom,rgba(255,255,255,0.02),transparent_35%)]" />
 
       <div className="relative mx-auto flex max-w-7xl flex-col gap-6 px-6 py-8 lg:px-10">
+          <div className="rounded-2xl border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-center text-sm font-medium text-amber-100 shadow-[0_0_20px_rgba(252,211,77,0.08)]">
+            ※非公式のファンサイトです
+          </div>
         <header className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl">
           <div className="grid gap-6 p-6 lg:grid-cols-[1.1fr_1fr] lg:p-8">
             <div className="space-y-5">
@@ -160,6 +163,9 @@ export default function App() {
                   />
                   <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(9,11,17,0.08),rgba(9,11,17,0.18))]" />
                 </div>
+                  <p className="mt-3 px-1 text-[11px] leading-5 text-white/45">
+                    GODDESS OF VICTORY: NIKKEの画像・権利は権利者に帰属
+                  </p>
               </div>
 
               <div className="mt-5 rounded-2xl border border-[#f6b44b]/20 bg-[linear-gradient(180deg,rgba(246,180,75,0.14),rgba(255,255,255,0.02))] p-4 sm:p-5">
