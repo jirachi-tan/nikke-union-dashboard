@@ -163,9 +163,9 @@ export default function App() {
                   />
                   <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(9,11,17,0.08),rgba(9,11,17,0.18))]" />
                 </div>
-                  <p className="mt-3 px-1 text-[11px] leading-5 text-white/45">
-                    GODDESS OF VICTORY: NIKKEの画像・権利は権利者に帰属
-                  </p>
+                <p className="mt-3 px-1 text-[10px] leading-4 text-white/45 sm:text-[11px] sm:leading-5 break-words">
+                  GODDESS OF VICTORY: NIKKEの画像・権利は権利者に帰属
+                </p>
               </div>
 
               <div className="mt-5 rounded-2xl border border-[#f6b44b]/20 bg-[linear-gradient(180deg,rgba(246,180,75,0.14),rgba(255,255,255,0.02))] p-4 sm:p-5">
