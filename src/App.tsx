@@ -261,7 +261,7 @@ export default function App() {
                   </div>
                 </div>
               </div>
-                              <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-3">
+                <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-3">
                   <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
                     <img
                       src={mascotGifPath}
@@ -270,6 +270,9 @@ export default function App() {
                     />
                   </div>
                 </div>
+                  <p className="mt-3 px-1 text-[8px] leading-4 text-white/45 sm:text-[9px] sm:leading-4 break-words">
+                    GODDESS OF VICTORY: NIKKEの画像・権利は権利者に帰属します。
+                  </p>
             </div>
 
             <div className="flex min-h-full flex-col rounded-3xl border border-[#f6b44b]/15 bg-[linear-gradient(180deg,rgba(246,180,75,0.14),rgba(255,255,255,0.03))] p-5 sm:p-6">
@@ -286,7 +289,7 @@ export default function App() {
                   <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(9,11,17,0.08),rgba(9,11,17,0.18))]" />
                 </div>
                 <p className="mt-3 px-1 text-[8px] leading-4 text-white/45 sm:text-[9px] sm:leading-4 break-words">
-                  GODDESS OF VICTORY: NIKKEの画像・権利は権利者に帰属
+                  GODDESS OF VICTORY: NIKKEの画像・権利は権利者に帰属します。
                 </p>
               </div>
 
