@@ -346,7 +346,6 @@ export default function App() {
               <div className="h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={recentRaidResults}
-                      data={recentRaidResults}
                       margin={{ top: 20, right: 24, left: 0, bottom: 8 }}
                     >
                     <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
