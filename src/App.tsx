@@ -59,6 +59,29 @@ const recentRaidResults = [
   { raid: "R8.3", percent: 1.51 },
 ];
 
+type LevelTickProps = {
+  x?: number;
+  y?: number;
+  payload?: { value: string };
+  isMobile: boolean;
+};
+
+function LevelAxisTick({ x, y, payload, isMobile }: LevelTickProps) {
+  if (x == null || y == null || !payload) return null;
+
+  return (
+    <text
+      x={x}
+      y={y + 12}
+      textAnchor="middle"
+      fill="rgba(255,255,255,0.6)"
+      fontSize={isMobile ? 9 : 12}
+    >
+      {payload.value}
+    </text>
+  );
+}
+
 type RaidDotProps = {
   cx?: number;
   cy?: number;
@@ -304,12 +327,11 @@ export default function App() {
                     <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
                       <XAxis
                         dataKey="range"
-                        stroke="rgba(255,255,255,0.6)"
                         tickLine={false}
                         axisLine={false}
                         interval={0}
                         minTickGap={0}
-                        tick={{ fontSize: isMobile ? 9 : 14 }}
+                        tick={<LevelAxisTick isMobile={isMobile} />}
                         tickMargin={8}
                       />
                     <YAxis
