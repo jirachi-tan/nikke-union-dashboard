@@ -196,6 +196,7 @@ export default function App() {
                   </div>
 
                   <div className="mt-4 space-y-2 border-t border-white/10 pt-4 text-xs leading-5 text-white/60">
+                    <div>※難しい場合は一言連絡ください</div>
                     <div>※加入は日本の方限定</div>
                     <div>※加入承認制</div>
                   </div>
