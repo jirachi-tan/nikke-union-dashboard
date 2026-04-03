@@ -17,6 +17,8 @@ import {
   Line,
 } from "recharts";
 
+import { useEffect, useState } from "react";
+
 const unionInfo = {
   name: "PEACH",
   id: "12894",
@@ -117,6 +119,17 @@ export default function App() {
   const bestPercent = Math.min(...recentRaidResults.map((r) => r.percent));
   const latestPercent = recentRaidResults[recentRaidResults.length - 1].percent;
   const visualPath = `${import.meta.env.BASE_URL}images/union-visual.png`;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const update = () => setIsMobile(window.innerWidth < 640);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  
+  const barCategoryGap = isMobile ? 8 : 18;
+  const maxBarSize = isMobile ? 48 : 56;
 
   return (
     <div className="min-h-screen bg-[#090b11] text-white">
@@ -287,7 +300,7 @@ export default function App() {
 
               <div className="h-80 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={levelDistribution} barCategoryGap={18}>
+                <BarChart data={levelDistribution} barCategoryGap={barCategoryGap}>
                     <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
                     <XAxis
                       dataKey="range"
@@ -309,7 +322,12 @@ export default function App() {
                         color: 'white',
                       }}
                     />
-                    <Bar dataKey="members" radius={[10, 10, 0, 0]} fill="rgba(246,180,75,0.95)" />
+                      <Bar
+                        dataKey="members"
+                        radius={[10, 10, 0, 0]}
+                        fill="rgba(246,180,75,0.95)"
+                        maxBarSize={maxBarSize}
+                      />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
