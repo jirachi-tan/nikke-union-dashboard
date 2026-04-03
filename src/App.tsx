@@ -72,10 +72,10 @@ function LevelAxisTick({ x, y, payload, isMobile }: LevelTickProps) {
   return (
     <text
       x={x}
-      y={y + 12}
+      y={y + 18}
       textAnchor="middle"
       fill="rgba(255,255,255,0.6)"
-      fontSize={isMobile ? 9 : 12}
+      fontSize={isMobile ? 9 : 18}
     >
       {payload.value}
     </text>
