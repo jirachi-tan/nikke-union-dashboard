@@ -286,12 +286,15 @@ export default function App() {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={recentRaidResults}>
                     <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
-                    <XAxis
-                      dataKey="raid"
-                      stroke="rgba(255,255,255,0.6)"
-                      tickLine={false}
-                      axisLine={false}
-                    />
+                      <XAxis
+                        dataKey="raid"
+                        stroke="rgba(255,255,255,0.6)"
+                        tickLine={false}
+                        axisLine={false}
+                        interval={0}
+                        minTickGap={0}
+                        tick={{ fontSize: 12 }}
+                      />
                     <YAxis
                       stroke="rgba(255,255,255,0.6)"
                       tickLine={false}
