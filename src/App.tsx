@@ -309,7 +309,7 @@ export default function App() {
                         axisLine={false}
                         interval={0}
                         minTickGap={0}
-                        tick={{ fontSize: isMobile ? 9 : 12 }}
+                        tick={{ fontSize: isMobile ? 9 : 14 }}
                         tickMargin={8}
                       />
                     <YAxis
