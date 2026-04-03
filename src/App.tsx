@@ -64,6 +64,7 @@ export default function App() {
   const maxSyncLevel = Math.max(...syncLevels);
 
   const bestPercent = Math.min(...recentRaidResults.map((r) => r.percent));
+  const latestPercent = recentRaidResults[recentRaidResults.length - 1].percent;
   const visualPath = `${import.meta.env.BASE_URL}images/union-visual.png`;
 
   return (
@@ -276,15 +277,25 @@ export default function App() {
                   <h2 className="mt-2 text-2xl font-bold">ユニオンレイド成績推移</h2>
                 </div>
 
-                <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-right">
-                  <div className="text-xs text-white/45">最高成績</div>
-                  <div className="text-xl font-bold">TOP {bestPercent.toFixed(2)}%</div>
+                <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                  <div className="grid grid-cols-2 gap-4 text-right">
+                    <div>
+                      <div className="text-xs text-white/45">最高成績</div>
+                      <div className="text-xl font-bold">TOP {bestPercent.toFixed(2)}%</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-white/45">直近成績</div>
+                      <div className="text-xl font-bold text-cyan-300">TOP {latestPercent.toFixed(2)}%</div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               <div className="h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={recentRaidResults}>
+                  <LineChart data={recentRaidResults}
+                      margin={{ top: 8, right: 24, left: 0, bottom: 8 }}
+                    >
                     <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
                       <XAxis
                         dataKey="raid"
@@ -293,7 +304,9 @@ export default function App() {
                         axisLine={false}
                         interval={0}
                         minTickGap={0}
-                        tick={{ fontSize: 12 }}
+                        tick={{ fontSize: 11 }}
+                        tickMargin={8}
+                        padding={{ left: 8, right: 16 }}
                       />
                     <YAxis
                       stroke="rgba(255,255,255,0.6)"
