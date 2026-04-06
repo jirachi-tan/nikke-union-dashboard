@@ -27,6 +27,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
 import Papa from "papaparse";
+import type { ParseResult } from "papaparse";
 
 const unionInfo = {
   name: "PEACH",
@@ -616,9 +617,9 @@ function EventsPage() {
       download: true,
       header: true,
       skipEmptyLines: true,
-      complete: (results) => {
+      complete: (results: ParseResult<CsvRow>) => {
         const parsed = results.data
-          .map((row): EventItem | null => {
+          .map((row: CsvRow): EventItem | null => {
             const name = normalizeText(row["名称"]);
             if (!name) return null;
 
@@ -632,7 +633,7 @@ function EventsPage() {
               note: normalizeText(row["備考"]) || "—",
             };
           })
-          .filter((item): item is EventItem => item !== null);
+          .filter((item: EventItem | null): item is EventItem => item !== null);
 
         setEvents(parsed);
         setLoading(false);
