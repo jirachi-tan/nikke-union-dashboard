@@ -698,9 +698,9 @@ function EventsPage() {
               <div className="text-sm font-semibold uppercase tracking-[0.2em]">Event List</div>
             </div>
             <h1 className="mt-2 text-3xl font-black text-white sm:text-4xl">イベント一覧</h1>
-            <p className="mt-2 text-sm leading-6 text-white/60">
-              実装状況、開催期間、アーカイブ追加日を一覧で確認できます。
-            </p>
+              <p className="mt-2 text-sm leading-6 text-white/60">
+                アーカイブ実装状況、イベント開催期間、アーカイブ追加日を一覧で確認できます。
+              </p>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
@@ -772,12 +772,12 @@ function EventsPage() {
             <div className="hidden xl:block">
               <div className="overflow-hidden rounded-2xl border border-white/10">
                 <div className="grid grid-cols-[120px_1.8fr_140px_140px_150px_150px_1.3fr] gap-4 border-b border-white/10 bg-white/[0.04] px-5 py-4 text-xs font-semibold uppercase tracking-[0.16em] text-white/45">
-                  <div>状態</div>
+                  <div>アーカイブ</div>
                   <div>イベント名</div>
                   <div>開始日</div>
                   <div>終了日</div>
-                  <div>アーカイブ</div>
-                  <div>追加まで</div>
+                  <div>アーカイブ追加日</div>
+                  <div>追加までの日数(日)</div>
                   <div>備考</div>
                 </div>
 
@@ -841,7 +841,7 @@ function EventsPage() {
                       <div className="mt-1 text-sm font-semibold">{item.archiveDate || "—"}</div>
                     </div>
                     <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3">
-                      <div className="text-[11px] text-white/45">追加までの日数</div>
+                      <div className="text-[11px] text-white/45">追加までの日数(日)</div>
                       <div className="mt-1 text-sm font-semibold">
                         {item.daysToArchive != null ? `${item.daysToArchive}日` : "—"}
                       </div>
