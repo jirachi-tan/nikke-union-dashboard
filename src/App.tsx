@@ -544,22 +544,321 @@ function DashboardPage() {
   );
 }
 
+function EventsPage() {import { CalendarDays, Search, Filter, Archive, Clock3, Sparkles } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import Papa from "papaparse";
+
+type EventStatus = "implemented" | "unimplemented";
+
+type EventItem = {
+  status: EventStatus;
+  name: string;
+  startDate: string;
+  endDate: string;
+  archiveDate: string;
+  daysToArchive: number | null;
+  note: string;
+};
+
+type CsvRow = {
+  読了?: string;
+  "未実装/実装"?: string;
+  名称?: string;
+  イベ開始日?: string;
+  イベ終了日?: string;
+  アーカイブ追加日?: string;
+  "イベ終了から\nアーカイブ追加まで(日)"?: string;
+  備考?: string;
+  [key: string]: string | undefined;
+};
+
+function normalizeStatus(value?: string): EventStatus {
+  return value?.trim() === "◯" ? "implemented" : "unimplemented";
+}
+
+function normalizeText(value?: string) {
+  return (value ?? "").trim();
+}
+
+function normalizeNumber(value?: string) {
+  const raw = normalizeText(value);
+  if (!raw || raw === "—" || raw === "-") return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+}
+
+function parseDateLabel(value?: string) {
+  const raw = normalizeText(value);
+  if (!raw) return "—";
+  return raw;
+}
+
+function statusLabel(status: EventStatus) {
+  return status === "implemented" ? "実装済み" : "未実装";
+}
+
+function statusClass(status: EventStatus) {
+  return status === "implemented"
+    ? "border-cyan-300/20 bg-cyan-300/10 text-cyan-100"
+    : "border-amber-300/20 bg-amber-300/10 text-amber-100";
+}
+
 function EventsPage() {
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<"all" | "implemented" | "unimplemented" | "archive-pending">("all");
+  const [sortBy, setSortBy] = useState<"start-asc" | "start-desc">("start-asc");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Papa.parse<CsvRow>(`${import.meta.env.BASE_URL}data/events.csv`, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        const parsed = results.data
+          .map((row): EventItem | null => {
+            const name = normalizeText(row["名称"]);
+            if (!name) return null;
+
+            return {
+              status: normalizeStatus(row["未実装/実装"]),
+              name,
+              startDate: parseDateLabel(row["イベ開始日"]),
+              endDate: parseDateLabel(row["イベ終了日"]),
+              archiveDate: parseDateLabel(row["アーカイブ追加日"]),
+              daysToArchive: normalizeNumber(row["イベ終了から\nアーカイブ追加まで(日)"]),
+              note: normalizeText(row["備考"]) || "—",
+            };
+          })
+          .filter((item): item is EventItem => item !== null);
+
+        setEvents(parsed);
+        setLoading(false);
+      },
+      error: () => {
+        setEvents([]);
+        setLoading(false);
+      },
+    });
+  }, []);
+
+  const stats = useMemo(() => {
+    const implemented = events.filter((item) => item.status === "implemented").length;
+    const unimplemented = events.filter((item) => item.status === "unimplemented").length;
+    const archivePending = events.filter((item) => item.archiveDate === "—").length;
+
+    return {
+      total: events.length,
+      implemented,
+      unimplemented,
+      archivePending,
+    };
+  }, [events]);
+
+  const filteredEvents = useMemo(() => {
+    let items = [...events];
+
+    if (query.trim()) {
+      const q = query.trim().toLowerCase();
+      items = items.filter(
+        (item) =>
+          item.name.toLowerCase().includes(q) ||
+          item.note.toLowerCase().includes(q)
+      );
+    }
+
+    if (filter === "implemented") {
+      items = items.filter((item) => item.status === "implemented");
+    } else if (filter === "unimplemented") {
+      items = items.filter((item) => item.status === "unimplemented");
+    } else if (filter === "archive-pending") {
+      items = items.filter((item) => item.archiveDate === "—");
+    }
+
+    items.sort((a, b) => {
+      if (sortBy === "start-desc") {
+        return b.startDate.localeCompare(a.startDate);
+      }
+      return a.startDate.localeCompare(b.startDate);
+    });
+
+    return items;
+  }, [events, filter, query, sortBy]);
+
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
-      <div className="flex items-center gap-3 text-cyan-200">
-        <CalendarDays className="h-6 w-6" />
-        <div>
-          <div className="text-sm font-semibold uppercase tracking-[0.2em]">Event List</div>
-          <h2 className="mt-1 text-3xl font-black text-white">イベント一覧</h2>
+    <section className="space-y-6">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div className="flex items-center gap-3 text-cyan-200">
+              <CalendarDays className="h-6 w-6" />
+              <div className="text-sm font-semibold uppercase tracking-[0.2em]">Event List</div>
+            </div>
+            <h1 className="mt-2 text-3xl font-black text-white sm:text-4xl">イベント一覧</h1>
+            <p className="mt-2 text-sm leading-6 text-white/60">
+              実装状況、開催期間、アーカイブ追加日を一覧で確認できます。
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-4">
+              <div className="text-xs text-white/45">全イベント数</div>
+              <div className="mt-1 text-2xl font-black">{stats.total}</div>
+            </div>
+            <div className="rounded-2xl border border-cyan-300/15 bg-cyan-300/10 px-4 py-4">
+              <div className="text-xs text-cyan-100/70">実装済み</div>
+              <div className="mt-1 text-2xl font-black text-cyan-100">{stats.implemented}</div>
+            </div>
+            <div className="rounded-2xl border border-amber-300/15 bg-amber-300/10 px-4 py-4">
+              <div className="text-xs text-amber-100/70">未実装</div>
+              <div className="mt-1 text-2xl font-black text-amber-100">{stats.unimplemented}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-3 lg:grid-cols-[1.5fr_1fr_1fr]">
+          <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+            <Search className="h-4 w-4 text-white/45" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="イベント名 / 備考で検索"
+              className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/35"
+            />
+          </label>
+
+          <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+            <Filter className="h-4 w-4 text-white/45" />
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value as typeof filter)}
+              className="w-full bg-transparent text-sm text-white outline-none"
+            >
+              <option value="all" className="bg-[#11151f]">全件</option>
+              <option value="implemented" className="bg-[#11151f]">実装済み</option>
+              <option value="unimplemented" className="bg-[#11151f]">未実装</option>
+              <option value="archive-pending" className="bg-[#11151f]">アーカイブ未追加</option>
+            </select>
+          </label>
+
+          <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+            <Clock3 className="h-4 w-4 text-white/45" />
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+              className="w-full bg-transparent text-sm text-white outline-none"
+            >
+              <option value="start-asc" className="bg-[#11151f]">開始日が古い順</option>
+              <option value="start-desc" className="bg-[#11151f]">開始日が新しい順</option>
+            </select>
+          </label>
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-dashed border-white/10 bg-black/20 p-8 text-center text-white/60">
-        ここにイベント一覧ページの内容を追加できます。
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-4 shadow-2xl backdrop-blur-xl sm:p-6">
+        {loading ? (
+          <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 p-10 text-center text-white/60">
+            読み込み中...
+          </div>
+        ) : filteredEvents.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 p-10 text-center text-white/60">
+            条件に一致するイベントがありません。
+          </div>
+        ) : (
+          <>
+            <div className="hidden xl:block">
+              <div className="overflow-hidden rounded-2xl border border-white/10">
+                <div className="grid grid-cols-[120px_1.8fr_140px_140px_150px_150px_1.3fr] gap-4 border-b border-white/10 bg-white/[0.04] px-5 py-4 text-xs font-semibold uppercase tracking-[0.16em] text-white/45">
+                  <div>状態</div>
+                  <div>イベント名</div>
+                  <div>開始日</div>
+                  <div>終了日</div>
+                  <div>アーカイブ</div>
+                  <div>追加まで</div>
+                  <div>備考</div>
+                </div>
+
+                <div className="divide-y divide-white/10">
+                  {filteredEvents.map((item) => (
+                    <div
+                      key={`${item.name}-${item.startDate}`}
+                      className="grid grid-cols-[120px_1.8fr_140px_140px_150px_150px_1.3fr] gap-4 px-5 py-4 text-sm text-white/82"
+                    >
+                      <div>
+                        <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${statusClass(item.status)}`}>
+                          {statusLabel(item.status)}
+                        </span>
+                      </div>
+                      <div className="font-semibold text-white">{item.name}</div>
+                      <div>{item.startDate}</div>
+                      <div>{item.endDate}</div>
+                      <div>{item.archiveDate || "—"}</div>
+                      <div>{item.daysToArchive != null ? `${item.daysToArchive}日` : "—"}</div>
+                      <div className="text-white/65">{item.note}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-4 xl:hidden">
+              {filteredEvents.map((item) => (
+                <article
+                  key={`${item.name}-${item.startDate}`}
+                  className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${statusClass(item.status)}`}>
+                          {statusLabel(item.status)}
+                        </span>
+                        {item.archiveDate === "—" && (
+                          <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">
+                            アーカイブ未追加
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="mt-3 text-lg font-bold text-white">{item.name}</h3>
+                    </div>
+                    <Sparkles className="h-5 w-5 text-[#ffd38b]" />
+                  </div>
+
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3">
+                      <div className="text-[11px] text-white/45">開始日</div>
+                      <div className="mt-1 text-sm font-semibold">{item.startDate}</div>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3">
+                      <div className="text-[11px] text-white/45">終了日</div>
+                      <div className="mt-1 text-sm font-semibold">{item.endDate}</div>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3">
+                      <div className="text-[11px] text-white/45">アーカイブ追加日</div>
+                      <div className="mt-1 text-sm font-semibold">{item.archiveDate || "—"}</div>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3">
+                      <div className="text-[11px] text-white/45">追加までの日数</div>
+                      <div className="mt-1 text-sm font-semibold">
+                        {item.daysToArchive != null ? `${item.daysToArchive}日` : "—"}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3">
+                    <div className="text-[11px] text-white/45">備考</div>
+                    <div className="mt-1 text-sm leading-6 text-white/75">{item.note}</div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </section>
   );
+}
 }
 
 export default function App() {
