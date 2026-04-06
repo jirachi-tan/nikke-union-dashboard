@@ -8,6 +8,10 @@ import {
   X,
   CalendarDays,
   Home,
+  Search,
+  Filter,
+  Clock3,
+  Sparkles,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -22,6 +26,7 @@ import {
 } from "recharts";
 import { useEffect, useMemo, useState } from "react";
 import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
+import Papa from "papaparse";
 
 const unionInfo = {
   name: "PEACH",
@@ -158,6 +163,61 @@ function CustomRaidDot({ cx, cy, payload }: RaidDotProps) {
       strokeWidth={3}
     />
   );
+}
+
+type EventStatus = "implemented" | "unimplemented";
+
+type EventItem = {
+  status: EventStatus;
+  name: string;
+  startDate: string;
+  endDate: string;
+  archiveDate: string;
+  daysToArchive: number | null;
+  note: string;
+};
+
+type CsvRow = {
+  読了?: string;
+  "未実装/実装"?: string;
+  名称?: string;
+  イベ開始日?: string;
+  イベ終了日?: string;
+  アーカイブ追加日?: string;
+  "イベ終了から\nアーカイブ追加まで(日)"?: string;
+  備考?: string;
+  [key: string]: string | undefined;
+};
+
+function normalizeStatus(value?: string): EventStatus {
+  return value?.trim() === "◯" ? "implemented" : "unimplemented";
+}
+
+function normalizeText(value?: string) {
+  return (value ?? "").trim();
+}
+
+function normalizeNumber(value?: string) {
+  const raw = normalizeText(value);
+  if (!raw || raw === "—" || raw === "-") return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+}
+
+function parseDateLabel(value?: string) {
+  const raw = normalizeText(value);
+  if (!raw) return "—";
+  return raw;
+}
+
+function statusLabel(status: EventStatus) {
+  return status === "implemented" ? "実装済み" : "未実装";
+}
+
+function statusClass(status: EventStatus) {
+  return status === "implemented"
+    ? "border-cyan-300/20 bg-cyan-300/10 text-cyan-100"
+    : "border-amber-300/20 bg-amber-300/10 text-amber-100";
 }
 
 function NavMenu() {
@@ -544,65 +604,6 @@ function DashboardPage() {
   );
 }
 
-function EventsPage() {import { CalendarDays, Search, Filter, Archive, Clock3, Sparkles } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import Papa from "papaparse";
-
-type EventStatus = "implemented" | "unimplemented";
-
-type EventItem = {
-  status: EventStatus;
-  name: string;
-  startDate: string;
-  endDate: string;
-  archiveDate: string;
-  daysToArchive: number | null;
-  note: string;
-};
-
-type CsvRow = {
-  読了?: string;
-  "未実装/実装"?: string;
-  名称?: string;
-  イベ開始日?: string;
-  イベ終了日?: string;
-  アーカイブ追加日?: string;
-  "イベ終了から\nアーカイブ追加まで(日)"?: string;
-  備考?: string;
-  [key: string]: string | undefined;
-};
-
-function normalizeStatus(value?: string): EventStatus {
-  return value?.trim() === "◯" ? "implemented" : "unimplemented";
-}
-
-function normalizeText(value?: string) {
-  return (value ?? "").trim();
-}
-
-function normalizeNumber(value?: string) {
-  const raw = normalizeText(value);
-  if (!raw || raw === "—" || raw === "-") return null;
-  const n = Number(raw);
-  return Number.isFinite(n) ? n : null;
-}
-
-function parseDateLabel(value?: string) {
-  const raw = normalizeText(value);
-  if (!raw) return "—";
-  return raw;
-}
-
-function statusLabel(status: EventStatus) {
-  return status === "implemented" ? "実装済み" : "未実装";
-}
-
-function statusClass(status: EventStatus) {
-  return status === "implemented"
-    ? "border-cyan-300/20 bg-cyan-300/10 text-cyan-100"
-    : "border-amber-300/20 bg-amber-300/10 text-amber-100";
-}
-
 function EventsPage() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [query, setQuery] = useState("");
@@ -858,7 +859,6 @@ function EventsPage() {
       </div>
     </section>
   );
-}
 }
 
 export default function App() {
