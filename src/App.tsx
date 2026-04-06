@@ -740,7 +740,6 @@ function EventsPage() {
               <option value="all" className="bg-[#11151f]">全件</option>
               <option value="implemented" className="bg-[#11151f]">実装済み</option>
               <option value="unimplemented" className="bg-[#11151f]">未実装</option>
-              <option value="archive-pending" className="bg-[#11151f]">アーカイブ未追加</option>
             </select>
           </label>
 
