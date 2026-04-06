@@ -4,6 +4,10 @@ import {
   Users,
   Swords,
   AlertTriangle,
+  Menu,
+  X,
+  CalendarDays,
+  Home,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -16,8 +20,8 @@ import {
   LineChart,
   Line,
 } from "recharts";
-
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
 
 const unionInfo = {
   name: "PEACH",
@@ -156,16 +160,84 @@ function CustomRaidDot({ cx, cy, payload }: RaidDotProps) {
   );
 }
 
-export default function App() {
+function NavMenu() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const baseItem =
+    "flex w-full items-center gap-3 px-4 py-3 text-left text-sm transition";
+  const activeItem = "bg-white/10 text-white";
+  const inactiveItem = "text-white/80 hover:bg-white/5";
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+      >
+        {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+        メニュー
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 top-full z-30 mt-2 min-w-[220px] overflow-hidden rounded-2xl border border-white/10 bg-[#11151f]/95 shadow-2xl backdrop-blur-xl">
+          <NavLink
+            to="/"
+            end
+            onClick={() => setIsOpen(false)}
+            className={({ isActive }) =>
+              `${baseItem} border-b border-white/10 ${isActive ? activeItem : inactiveItem}`
+            }
+          >
+            <Home className="h-4 w-4 text-[#ffd38b]" />
+            ダッシュボード
+          </NavLink>
+
+          <NavLink
+            to="/events"
+            onClick={() => setIsOpen(false)}
+            className={({ isActive }) =>
+              `${baseItem} ${isActive ? activeItem : inactiveItem}`
+            }
+          >
+            <CalendarDays className="h-4 w-4 text-cyan-300" />
+            イベント一覧
+          </NavLink>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Shell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen bg-[#090b11] text-white">
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,173,51,0.16),transparent_28%),radial-gradient(circle_at_top_right,rgba(56,189,248,0.12),transparent_25%),linear-gradient(to_bottom,rgba(255,255,255,0.02),transparent_35%)]" />
+
+      <div className="relative mx-auto flex max-w-7xl flex-col gap-6 px-6 py-8 lg:px-10">
+        <div className="flex items-center justify-between gap-4">
+          <div className="rounded-2xl border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-center text-sm font-medium text-amber-100 shadow-[0_0_20px_rgba(252,211,77,0.08)]">
+            ※非公式のファンサイトです
+          </div>
+          <NavMenu />
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function DashboardPage() {
   const avgSyncLevel = Math.round(
     syncLevels.reduce((sum, level) => sum + level, 0) / Math.max(syncLevels.length, 1)
   );
   const maxSyncLevel = Math.max(...syncLevels);
-
   const bestPercent = Math.min(...recentRaidResults.map((r) => r.percent));
   const latestPercent = recentRaidResults[recentRaidResults.length - 1].percent;
+
   const visualPath = `${import.meta.env.BASE_URL}images/union-visual.png`;
   const mascotGifPath = `${import.meta.env.BASE_URL}images/union-mascot.gif`;
+
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -174,174 +246,169 @@ export default function App() {
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
-  
+
   const barCategoryGap = isMobile ? 8 : 18;
   const maxBarSize = isMobile ? 48 : 56;
 
   return (
-    <div className="min-h-screen bg-[#090b11] text-white">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,173,51,0.16),transparent_28%),radial-gradient(circle_at_top_right,rgba(56,189,248,0.12),transparent_25%),linear-gradient(to_bottom,rgba(255,255,255,0.02),transparent_35%)]" />
+    <>
+      <header className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl">
+        <div className="grid gap-6 p-6 lg:grid-cols-[1.1fr_1fr] lg:p-8">
+          <div className="space-y-5">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 rounded-full border border-[#f6b44b]/40 bg-[#f6b44b]/10 px-3 py-1 text-sm text-[#ffd38b]">
+                <Shield className="h-4 w-4" />
+                NIKKE UNION DASHBOARD
+              </div>
+              <div className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm text-cyan-200">
+                ※2026/4/1時点の情報参照
+              </div>
+            </div>
 
-      <div className="relative mx-auto flex max-w-7xl flex-col gap-6 px-6 py-8 lg:px-10">
-          <div className="rounded-2xl border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-center text-sm font-medium text-amber-100 shadow-[0_0_20px_rgba(252,211,77,0.08)]">
-            ※非公式のファンサイトです
-          </div>
-        <header className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl">
-          <div className="grid gap-6 p-6 lg:grid-cols-[1.1fr_1fr] lg:p-8">
-            <div className="space-y-5">
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2 rounded-full border border-[#f6b44b]/40 bg-[#f6b44b]/10 px-3 py-1 text-sm text-[#ffd38b]">
+            <div className="rounded-3xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-6">
+              <p className="text-sm uppercase tracking-[0.28em] text-white/45">Union Profile</p>
+              <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <h1 className="text-5xl font-black tracking-tight sm:text-6xl">{unionInfo.name}</h1>
+
+                <div className="inline-flex items-center gap-3 self-start rounded-2xl border border-white/10 bg-black/25 px-5 py-4 sm:mt-1">
+                  <div className="text-xs uppercase tracking-[0.18em] text-white/45">Union ID</div>
+                  <div className="text-2xl font-black tracking-[0.12em] text-white sm:text-3xl">
+                    {unionInfo.id}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4">
+                <div className="text-xs uppercase tracking-[0.18em] text-white/45">Union Status</div>
+                <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
+                  <div>
+                    <div className="text-3xl font-black text-white">
+                      {unionInfo.currentMembers}
+                      <span className="text-lg text-white/55"> / {unionInfo.maxMembers}</span>
+                    </div>
+                    <div className="mt-1 text-sm text-white/62">現在の在籍メンバー数</div>
+                  </div>
+
+                  <div className="flex flex-col items-start gap-2 sm:items-end">
+                    <div className="rounded-full border border-[#f6b44b]/30 bg-[#f6b44b]/10 px-3 py-1 text-sm font-semibold text-[#ffd38b]">
+                      {unionInfo.recruitmentStatus}
+                    </div>
+                    <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-white/78">
+                      募集人数：{unionInfo.maxMembers - unionInfo.currentMembers}名
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
+                <div className="flex items-center gap-2 text-cyan-200">
                   <Shield className="h-4 w-4" />
-                  NIKKE UNION DASHBOARD
+                  <div className="text-sm font-semibold tracking-wide text-white">ユニオン内の運用</div>
                 </div>
-                <div className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm text-cyan-200">
-                  ※2026/4/1時点の情報参照
-                </div>
-              </div>
-
-              <div className="rounded-3xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-6">
-                <p className="text-sm uppercase tracking-[0.28em] text-white/45">Union Profile</p>
-                <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <h1 className="text-5xl font-black tracking-tight sm:text-6xl">{unionInfo.name}</h1>
-
-                  <div className="inline-flex items-center gap-3 self-start rounded-2xl border border-white/10 bg-black/25 px-5 py-4 sm:mt-1">
-                    <div className="text-xs uppercase tracking-[0.18em] text-white/45">Union ID</div>
-                    <div className="text-2xl font-black tracking-[0.12em] text-white sm:text-3xl">
-                      {unionInfo.id}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4">
-                  <div className="text-xs uppercase tracking-[0.18em] text-white/45">Union Status</div>
-                  <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
-                    <div>
-                      <div className="text-3xl font-black text-white">
-                        {unionInfo.currentMembers}
-                        <span className="text-lg text-white/55"> / {unionInfo.maxMembers}</span>
-                      </div>
-                      <div className="mt-1 text-sm text-white/62">現在の在籍メンバー数</div>
-                    </div>
-
-                    <div className="flex flex-col items-start gap-2 sm:items-end">
-                      <div className="rounded-full border border-[#f6b44b]/30 bg-[#f6b44b]/10 px-3 py-1 text-sm font-semibold text-[#ffd38b]">
-                        {unionInfo.recruitmentStatus}
-                      </div>
-                      <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-white/78">
-                        募集人数：{unionInfo.maxMembers - unionInfo.currentMembers}名
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
-                  <div className="flex items-center gap-2 text-cyan-200">
-                    <Shield className="h-4 w-4" />
-                    <div className="text-sm font-semibold tracking-wide text-white">ユニオン内の運用</div>
-                  </div>
-                  <div className="mt-4 grid gap-3">
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4">
-                      <div className="text-sm font-semibold text-white">ユニオンレイドの進め方</div>
-                      <p className="mt-1 text-xs leading-5 text-white/62">
-                        ノーマルは早い者勝ち、ハードは全員参加で時間指定あり。凸指定はありません。
-                      </p>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4">
-                      <div className="text-sm font-semibold text-white">協同作戦もユニオン内で実施</div>
-                      <p className="mt-1 text-xs leading-5 text-white/62">
-                        Discordでの協同作戦は22時頃が多いです。VCもあります(チャット参加OK)。
-                      </p>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4">
-                      <div className="text-sm font-semibold text-white">ネタバレのご配慮</div>
-                      <p className="mt-1 text-xs leading-5 text-white/62">
-                        ネタバレには気をつけましょう！ロール選択チャネルにてロールを選択しましょう。
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-                <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-3">
-                  <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
-                    <img
-                      src={mascotGifPath}
-                      alt="ユニオンマスコットGIF"
-                      className="w-full object-cover"
-                    />
-                  </div>
-                    <p className="mt-3 px-1 text-[8px] leading-4 text-white/45 sm:text-[9px] sm:leading-4 break-words">
-                      GODDESS OF VICTORY: NIKKEの画像・権利は権利者に帰属します。
+                <div className="mt-4 grid gap-3">
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4">
+                    <div className="text-sm font-semibold text-white">ユニオンレイドの進め方</div>
+                    <p className="mt-1 text-xs leading-5 text-white/62">
+                      ノーマルは早い者勝ち、ハードは全員参加で時間指定あり。凸指定はありません。
                     </p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4">
+                    <div className="text-sm font-semibold text-white">協同作戦もユニオン内で実施</div>
+                    <p className="mt-1 text-xs leading-5 text-white/62">
+                      Discordでの協同作戦は22時頃が多いです。VCもあります(チャット参加OK)。
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4">
+                    <div className="text-sm font-semibold text-white">ネタバレのご配慮</div>
+                    <p className="mt-1 text-xs leading-5 text-white/62">
+                      ネタバレには気をつけましょう！ロール選択チャネルにてロールを選択しましょう。
+                    </p>
+                  </div>
                 </div>
+              </div>
+
+              <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-3">
+                <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
+                  <img
+                    src={mascotGifPath}
+                    alt="ユニオンマスコットGIF"
+                    className="w-full object-cover"
+                  />
+                </div>
+                <p className="mt-3 px-1 text-[8px] leading-4 text-white/45 sm:text-[9px] sm:leading-4 break-words">
+                  GODDESS OF VICTORY: NIKKEの画像・権利は権利者に帰属します。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex min-h-full flex-col rounded-3xl border border-[#f6b44b]/15 bg-[linear-gradient(180deg,rgba(246,180,75,0.14),rgba(255,255,255,0.03))] p-5 sm:p-6">
+            <div className="flex-1 rounded-2xl border border-white/10 bg-black/15 p-3">
+              <div className="relative flex h-full min-h-[240px] items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-black/20">
+                <img
+                  src={visualPath}
+                  alt="ユニオンビジュアル"
+                  className="h-full min-h-[240px] w-full object-cover object-center"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(9,11,17,0.08),rgba(9,11,17,0.18))]" />
+              </div>
+              <p className="mt-3 px-1 text-[8px] leading-4 text-white/45 sm:text-[9px] sm:leading-4 break-words">
+                GODDESS OF VICTORY: NIKKEの画像・権利は権利者に帰属します。
+              </p>
             </div>
 
-            <div className="flex min-h-full flex-col rounded-3xl border border-[#f6b44b]/15 bg-[linear-gradient(180deg,rgba(246,180,75,0.14),rgba(255,255,255,0.03))] p-5 sm:p-6">
-              <div className="flex-1 rounded-2xl border border-white/10 bg-black/15 p-3">
-                <div className="relative flex h-full min-h-[240px] items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-black/20">
-                  <img
-                    src={visualPath}
-                    alt="ユニオンビジュアル"
-                    className="h-full min-h-[240px] w-full object-cover object-center"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(9,11,17,0.08),rgba(9,11,17,0.18))]" />
+            <div className="mt-5 rounded-2xl border border-[#f6b44b]/20 bg-[linear-gradient(180deg,rgba(246,180,75,0.14),rgba(255,255,255,0.02))] p-4 sm:p-5">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#f6b44b]/30 bg-[#f6b44b]/10 px-3 py-1 text-sm font-semibold text-[#ffd38b] shadow-[0_0_20px_rgba(246,180,75,0.12)]">
+                  <Users className="h-4 w-4" />
+                  加入・在籍ルール
                 </div>
-                    <p className="mt-3 px-1 text-[8px] leading-4 text-white/45 sm:text-[9px] sm:leading-4 break-words">
-                      GODDESS OF VICTORY: NIKKEの画像・権利は権利者に帰属します。
-                    </p>
               </div>
 
-              <div className="mt-5 rounded-2xl border border-[#f6b44b]/20 bg-[linear-gradient(180deg,rgba(246,180,75,0.14),rgba(255,255,255,0.02))] p-4 sm:p-5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-[#f6b44b]/30 bg-[#f6b44b]/10 px-3 py-1 text-sm font-semibold text-[#ffd38b] shadow-[0_0_20px_rgba(246,180,75,0.12)]">
-                    <Users className="h-4 w-4" />
-                    加入・在籍ルール
-                  </div>
+              <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+                <div className="flex items-center gap-2 text-[#ffd38b]">
+                  <AlertTriangle className="h-4 w-4" />
+                  <div className="text-sm font-semibold tracking-wide text-white">脱退条件</div>
+                </div>
+                <div className="mt-3 grid gap-2">
+                  {removalRules.map((rule) => (
+                    <div
+                      key={rule}
+                      className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3"
+                    >
+                      <div className="h-2 w-2 rounded-full bg-[#ffd38b]" />
+                      <div className="text-sm text-white/82">{rule}</div>
+                    </div>
+                  ))}
                 </div>
 
-                <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-                  <div className="flex items-center gap-2 text-[#ffd38b]">
-                    <AlertTriangle className="h-4 w-4" />
-                    <div className="text-sm font-semibold tracking-wide text-white">脱退条件</div>
-                  </div>
-                  <div className="mt-3 grid gap-2">
-                    {removalRules.map((rule) => (
-                      <div
-                        key={rule}
-                        className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3"
-                      >
-                        <div className="h-2 w-2 rounded-full bg-[#ffd38b]" />
-                        <div className="text-sm text-white/82">{rule}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-4 space-y-2 border-t border-white/10 pt-4 text-xs leading-5 text-white/60">
-                    <div>※難しい場合は一言連絡ください</div>
-                    <div>※加入は日本の方限定</div>
-                    <div>※加入承認制</div>
-                  </div>
+                <div className="mt-4 space-y-2 border-t border-white/10 pt-4 text-xs leading-5 text-white/60">
+                  <div>※難しい場合は一言連絡ください</div>
+                  <div>※加入は日本の方限定</div>
+                  <div>※加入承認制</div>
                 </div>
               </div>
             </div>
           </div>
-        </header>
+        </div>
+      </header>
 
-        <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-          <div className="space-y-6">
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-xl backdrop-blur-xl sm:p-6">
-              <div className="mb-5 flex items-center justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2 text-[#ffd38b]">
-                    <BarChart3 className="h-5 w-5" />
-                    <span className="text-sm font-semibold uppercase tracking-[0.2em]">
-                      Sync Level Distribution
-                    </span>
-                  </div>
-                  <h2 className="mt-2 text-2xl font-bold">シンクロレベル分布</h2>
+      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="space-y-6">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-xl backdrop-blur-xl sm:p-6">
+            <div className="mb-5 flex items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2 text-[#ffd38b]">
+                  <BarChart3 className="h-5 w-5" />
+                  <span className="text-sm font-semibold uppercase tracking-[0.2em]">
+                    Sync Level Distribution
+                  </span>
                 </div>
+                <h2 className="mt-2 text-2xl font-bold">シンクロレベル分布</h2>
+              </div>
 
               <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
                 <div className="grid grid-cols-2 gap-4 text-right">
@@ -355,121 +422,157 @@ export default function App() {
                   </div>
                 </div>
               </div>
-              </div>
+            </div>
 
-              <div className="h-80 w-full">
-                <ResponsiveContainer width="100%" height="100%">
+            <div className="h-80 w-full">
+              <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={levelDistribution} barCategoryGap={barCategoryGap}>
-                    <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
-                      <XAxis
-                        dataKey="range"
-                        tickLine={false}
-                        axisLine={false}
-                        interval={0}
-                        minTickGap={0}
-                        tick={<LevelAxisTick isMobile={isMobile} />}
-                        tickMargin={8}
-                      />
-                    <YAxis
-                      stroke="rgba(255,255,255,0.6)"
-                      tickLine={false}
-                      axisLine={false}
-                      allowDecimals={false}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        background: 'rgba(9,11,17,0.95)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: 16,
-                        color: 'white',
-                      }}
-                    />
-                      <Bar
-                        dataKey="members"
-                        radius={[10, 10, 0, 0]}
-                        fill="rgba(246,180,75,0.95)"
-                        maxBarSize={maxBarSize}
-                      />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+                  <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
+                  <XAxis
+                    dataKey="range"
+                    tickLine={false}
+                    axisLine={false}
+                    interval={0}
+                    minTickGap={0}
+                    tick={<LevelAxisTick isMobile={isMobile} />}
+                    tickMargin={8}
+                  />
+                  <YAxis
+                    stroke="rgba(255,255,255,0.6)"
+                    tickLine={false}
+                    axisLine={false}
+                    allowDecimals={false}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      background: "rgba(9,11,17,0.95)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: 16,
+                      color: "white",
+                    }}
+                  />
+                  <Bar
+                    dataKey="members"
+                    radius={[10, 10, 0, 0]}
+                    fill="rgba(246,180,75,0.95)"
+                    maxBarSize={maxBarSize}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
+        </div>
 
-          <div className="space-y-6">
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-xl backdrop-blur-xl sm:p-6">
-              <div className="mb-5 flex items-center justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2 text-cyan-200">
-                    <Swords className="h-5 w-5" />
-                    <span className="text-sm font-semibold uppercase tracking-[0.2em]">
-                      Union Raid Results
-                    </span>
-                  </div>
-                  <h2 className="mt-2 text-2xl font-bold">ユニオンレイド成績推移</h2>
+        <div className="space-y-6">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-xl backdrop-blur-xl sm:p-6">
+            <div className="mb-5 flex items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2 text-cyan-200">
+                  <Swords className="h-5 w-5" />
+                  <span className="text-sm font-semibold uppercase tracking-[0.2em]">
+                    Union Raid Results
+                  </span>
                 </div>
-
-                <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
-                  <div className="grid grid-cols-2 gap-4 text-right">
-                    <div>
-                      <div className="text-xs text-white/45">最高成績</div>
-                      <div className="text-xl font-bold">TOP {bestPercent.toFixed(2)}%</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-white/45">直近成績</div>
-                      <div className="text-xl font-bold text-cyan-300">TOP {latestPercent.toFixed(2)}%</div>
-                    </div>
-                  </div>
-                </div>
+                <h2 className="mt-2 text-2xl font-bold">ユニオンレイド成績推移</h2>
               </div>
 
-              <div className="h-72 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={recentRaidResults}
-                      margin={{ top: 20, right: 24, left: 0, bottom: 8 }}
-                    >
-                    <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
-                      <XAxis
-                        dataKey="raid"
-                        tickLine={false}
-                        axisLine={false}
-                        interval={0}
-                        minTickGap={0}
-                        tick={(props) => <RaidAxisTick {...props} isMobile={isMobile} />}
-                        tickMargin={8}
-                        padding={{ left: 8, right: 16 }}
-                      />
-                    <YAxis
-                      stroke="rgba(255,255,255,0.6)"
-                      tickLine={false}
-                      axisLine={false}
-                      reversed
-                      domain={[2.1, 1.3]}
-                      tickFormatter={(value: number) => `${value.toFixed(1)}%`}
-                    />
-                    <Tooltip
-                      formatter={(value: number | string) => [`TOP ${Number(value).toFixed(2)}%`, '成績']}
-                      contentStyle={{
-                        background: 'rgba(9,11,17,0.95)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: 16,
-                        color: 'white',
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="percent"
-                      stroke="rgba(103,232,249,0.95)"
-                      strokeWidth={3}
-                      dot={<CustomRaidDot />}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+              <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                <div className="grid grid-cols-2 gap-4 text-right">
+                  <div>
+                    <div className="text-xs text-white/45">最高成績</div>
+                    <div className="text-xl font-bold">TOP {bestPercent.toFixed(2)}%</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-white/45">直近成績</div>
+                    <div className="text-xl font-bold text-cyan-300">TOP {latestPercent.toFixed(2)}%</div>
+                  </div>
+                </div>
               </div>
             </div>
+
+            <div className="h-72 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={recentRaidResults}
+                  margin={{ top: 20, right: 24, left: 0, bottom: 8 }}
+                >
+                  <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
+                  <XAxis
+                    dataKey="raid"
+                    tickLine={false}
+                    axisLine={false}
+                    interval={0}
+                    minTickGap={0}
+                    tick={(props) => <RaidAxisTick {...props} isMobile={isMobile} />}
+                    tickMargin={8}
+                    padding={{ left: 8, right: 16 }}
+                  />
+                  <YAxis
+                    stroke="rgba(255,255,255,0.6)"
+                    tickLine={false}
+                    axisLine={false}
+                    reversed
+                    domain={[2.1, 1.3]}
+                    tickFormatter={(value: number) => `${value.toFixed(1)}%`}
+                  />
+                  <Tooltip
+                    formatter={(value: number | string) => [
+                      `TOP ${Number(value).toFixed(2)}%`,
+                      "成績",
+                    ]}
+                    contentStyle={{
+                      background: "rgba(9,11,17,0.95)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: 16,
+                      color: "white",
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="percent"
+                    stroke="rgba(103,232,249,0.95)"
+                    strokeWidth={3}
+                    dot={<CustomRaidDot />}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-        </section>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function EventsPage() {
+  return (
+    <section className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
+      <div className="flex items-center gap-3 text-cyan-200">
+        <CalendarDays className="h-6 w-6" />
+        <div>
+          <div className="text-sm font-semibold uppercase tracking-[0.2em]">Event List</div>
+          <h2 className="mt-1 text-3xl font-black text-white">イベント一覧</h2>
+        </div>
       </div>
-    </div>
+
+      <div className="mt-6 rounded-2xl border border-dashed border-white/10 bg-black/20 p-8 text-center text-white/60">
+        ここにイベント一覧ページの内容を追加できます。
+      </div>
+    </section>
+  );
+}
+
+export default function App() {
+  const basename = useMemo(() => import.meta.env.BASE_URL.replace(/\/$/, ""), []);
+
+  return (
+    <BrowserRouter basename={basename}>
+      <Shell>
+        <Routes>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/events" element={<EventsPage />} />
+        </Routes>
+      </Shell>
+    </BrowserRouter>
   );
 }
