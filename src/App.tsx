@@ -32,7 +32,7 @@ import type { ParseResult } from "papaparse";
 const unionInfo = {
   name: "PEACH",
   id: "12894",
-  currentMembers: 29,
+  currentMembers: 31,
   maxMembers: 32,
   recruitmentStatus: "募集中",
 };
@@ -40,9 +40,10 @@ const unionInfo = {
 const removalRules = ["未ログイン3日以上", "ハード戦無凸"];
 
 const syncLevels = [
-  160, 242, 269, 289, 267, 386, 342, 415, 373, 385,
-  439, 564, 595, 543, 569, 576, 562, 642, 594, 612,
-  636, 604, 582, 621, 637, 662, 668, 688, 673,
+  160, 245, 282, 280, 319, 401, 348, 427, 389, 404,
+  439, 540, 572, 604, 552, 587, 586, 576, 617, 611,
+  662, 602, 625, 654, 635, 642, 686, 702, 683, 706,
+  688,
 ];
 
 const levelBins = [
@@ -52,6 +53,7 @@ const levelBins = [
   { range: "400-499", min: 400, max: 499 },
   { range: "500-599", min: 500, max: 599 },
   { range: "600-699", min: 600, max: 699 },
+  { range: "700-799", min: 700, max: 799 },
 ];
 
 const levelDistribution = levelBins.map((bin) => ({
@@ -67,6 +69,7 @@ const recentRaidResults = [
   { raid: "R8.1", percent: 1.5 },
   { raid: "R8.2", percent: 1.59 },
   { raid: "R8.3", percent: 1.51 },
+  { raid: "R8.4", percent: 1.51 },
 ];
 
 type LevelTickProps = {
@@ -322,7 +325,7 @@ function DashboardPage() {
                 NIKKE UNION DASHBOARD
               </div>
               <div className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm text-cyan-200">
-                ※2026/4/1時点の情報参照
+                ※2026/5/7時点の情報参照
               </div>
             </div>
 
