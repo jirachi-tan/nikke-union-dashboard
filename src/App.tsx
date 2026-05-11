@@ -214,6 +214,40 @@ function parseDateLabel(value?: string) {
   return raw;
 }
 
+function calcDaysToArchive(endDate?: string, archiveDate?: string) {
+  const end = normalizeText(endDate);
+  const archive = normalizeText(archiveDate);
+
+  if (!end || !archive || end === "—" || archive === "—" || end === "-" || archive === "-") {
+    return null;
+  }
+
+  const endMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(end);
+  const archiveMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(archive);
+
+  if (!endMatch || !archiveMatch) {
+    return null;
+  }
+
+  const endTime = Date.UTC(
+    Number(endMatch[1]),
+    Number(endMatch[2]) - 1,
+    Number(endMatch[3])
+  );
+
+  const archiveTime = Date.UTC(
+    Number(archiveMatch[1]),
+    Number(archiveMatch[2]) - 1,
+    Number(archiveMatch[3])
+  );
+
+  if (!Number.isFinite(endTime) || !Number.isFinite(archiveTime)) {
+    return null;
+  }
+
+  return Math.round((archiveTime - endTime) / (1000 * 60 * 60 * 24));
+}
+
 function statusLabel(status: EventStatus) {
   return status === "implemented" ? "実装済み" : "未実装";
 }
@@ -627,20 +661,24 @@ Papa.parse<CsvRow>(`${import.meta.env.BASE_URL}data/events.csv`, {
       .replace(/\r/g, "\n")
       .trim(),
   complete: (results: ParseResult<CsvRow>) => {
-    console.log(results.meta.fields);
-console.log(results.data[0]);
     const parsed = results.data
       .map((row: CsvRow): EventItem | null => {
         const name = normalizeText(row["名称"]);
         if (!name) return null;
-
+        
+        const status = normalizeStatus(row["未実装/実装"]);
+        const csvDaysToArchive = normalizeNumber(row["イベ終了からアーカイブ追加まで(日)"]);
+        
         return {
-          status: normalizeStatus(row["未実装/実装"]),
+          status,
           name,
           startDate: parseDateLabel(row["イベ開始日"]),
           endDate: parseDateLabel(row["イベ終了日"]),
           archiveDate: parseDateLabel(row["アーカイブ追加日"]),
-          daysToArchive: normalizeNumber(row["イベ終了からアーカイブ追加まで(日)"]),
+          daysToArchive:
+            status === "implemented"
+              ? csvDaysToArchive ?? calcDaysToArchive(row["イベ終了日"], row["アーカイブ追加日"])
+              : null,
           note: normalizeText(row["備考"]) || "—",
         };
       })
