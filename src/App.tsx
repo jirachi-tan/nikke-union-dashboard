@@ -616,36 +616,42 @@ function EventsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Papa.parse<CsvRow>(`${import.meta.env.BASE_URL}data/events.csv`, {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: (results: ParseResult<CsvRow>) => {
-        const parsed = results.data
-          .map((row: CsvRow): EventItem | null => {
-            const name = normalizeText(row["名称"]);
-            if (!name) return null;
+Papa.parse<CsvRow>(`${import.meta.env.BASE_URL}data/events.csv`, {
+  download: true,
+  header: true,
+  skipEmptyLines: true,
+  transformHeader: (header) =>
+    header
+      .replace(/^\uFEFF/, "")
+      .replace(/\r\n/g, "\n")
+      .replace(/\r/g, "\n")
+      .trim(),
+  complete: (results: ParseResult<CsvRow>) => {
+    const parsed = results.data
+      .map((row: CsvRow): EventItem | null => {
+        const name = normalizeText(row["名称"]);
+        if (!name) return null;
 
-            return {
-              status: normalizeStatus(row["未実装/実装"]),
-              name,
-              startDate: parseDateLabel(row["イベ開始日"]),
-              endDate: parseDateLabel(row["イベ終了日"]),
-              archiveDate: parseDateLabel(row["アーカイブ追加日"]),
-              daysToArchive: normalizeNumber(row["イベ終了から\nアーカイブ追加まで(日)"]),
-              note: normalizeText(row["備考"]) || "—",
-            };
-          })
-          .filter((item: EventItem | null): item is EventItem => item !== null);
+        return {
+          status: normalizeStatus(row["未実装/実装"]),
+          name,
+          startDate: parseDateLabel(row["イベ開始日"]),
+          endDate: parseDateLabel(row["イベ終了日"]),
+          archiveDate: parseDateLabel(row["アーカイブ追加日"]),
+          daysToArchive: normalizeNumber(row["イベ終了から\nアーカイブ追加まで(日)"]),
+          note: normalizeText(row["備考"]) || "—",
+        };
+      })
+      .filter((item: EventItem | null): item is EventItem => item !== null);
 
-        setEvents(parsed);
-        setLoading(false);
-      },
-      error: () => {
-        setEvents([]);
-        setLoading(false);
-      },
-    });
+    setEvents(parsed);
+    setLoading(false);
+  },
+  error: () => {
+    setEvents([]);
+    setLoading(false);
+  },
+});
   }, []);
 
   const stats = useMemo(() => {
