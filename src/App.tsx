@@ -188,7 +188,7 @@ type CsvRow = {
   イベ開始日?: string;
   イベ終了日?: string;
   アーカイブ追加日?: string;
-  "イベ終了から\nアーカイブ追加まで(日)"?: string;
+  "イベ終了からアーカイブ追加まで(日)"?: string;
   備考?: string;
   [key: string]: string | undefined;
 };
