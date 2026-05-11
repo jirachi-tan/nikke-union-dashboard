@@ -627,6 +627,8 @@ Papa.parse<CsvRow>(`${import.meta.env.BASE_URL}data/events.csv`, {
       .replace(/\r/g, "\n")
       .trim(),
   complete: (results: ParseResult<CsvRow>) => {
+    console.log(results.meta.fields);
+console.log(results.data[0]);
     const parsed = results.data
       .map((row: CsvRow): EventItem | null => {
         const name = normalizeText(row["名称"]);
