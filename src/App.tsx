@@ -640,7 +640,7 @@ console.log(results.data[0]);
           startDate: parseDateLabel(row["イベ開始日"]),
           endDate: parseDateLabel(row["イベ終了日"]),
           archiveDate: parseDateLabel(row["アーカイブ追加日"]),
-          daysToArchive: normalizeNumber(row["イベ終了から\nアーカイブ追加まで(日)"]),
+          daysToArchive: normalizeNumber(row["イベ終了からアーカイブ追加まで(日)"]),
           note: normalizeText(row["備考"]) || "—",
         };
       })
