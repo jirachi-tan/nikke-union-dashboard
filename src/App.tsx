@@ -32,18 +32,17 @@ import type { ParseResult } from "papaparse";
 const unionInfo = {
   name: "PEACH",
   id: "12894",
-  currentMembers: 32,
+  currentMembers: 30,
   maxMembers: 32,
-  recruitmentStatus: "満員",
+  recruitmentStatus: "募集中",
 };
 
 const removalRules = ["未ログイン3日以上", "ハード戦無凸"];
 
 const syncLevels = [
-  707, 703, 703, 692, 687, 684, 670, 666, 658, 635,
-  630, 617, 611, 606, 602, 590, 589, 581, 576, 560,
-  553, 439, 428, 406, 390, 351, 320, 283, 281, 245,
-  403, 215,
+  726, 723, 722, 710, 705, 703, 688, 684, 680, 653,
+  652, 633, 626, 622, 615, 610, 601, 590, 585, 573,
+  560, 480, 442, 415, 406, 360, 352, 310, 299, 421,
 ];
 
 const levelBins = [
@@ -69,7 +68,9 @@ const recentRaidResults = [
   { raid: "R8.1", percent: 1.5 },
   { raid: "R8.2", percent: 1.59 },
   { raid: "R8.3", percent: 1.51 },
-  { raid: "R8.4", percent: 1.51 },
+  { raid: "R8.4", percent: 1.44 },
+  { raid: "R8.5", percent: 1.44 },
+  { raid: "R8.6", percent: 1.54 },
 ];
 
 type LevelTickProps = {
@@ -359,7 +360,7 @@ function DashboardPage() {
                 NIKKE UNION DASHBOARD
               </div>
               <div className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm text-cyan-200">
-                ※2026/5/12時点の情報参照
+                ※2026/6/24時点の情報参照
               </div>
             </div>
 
