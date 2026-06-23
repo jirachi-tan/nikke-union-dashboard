@@ -60,18 +60,119 @@ const levelDistribution = levelBins.map((bin) => ({
   members: syncLevels.filter((level) => level >= bin.min && level <= bin.max).length,
 }));
 
-const recentRaidResults = [
-  { raid: "R7.9", percent: 1.98 },
-  { raid: "R7.10", percent: 1.73 },
-  { raid: "R7.11", percent: 1.49 },
-  { raid: "R7.12", percent: 1.44 },
-  { raid: "R8.1", percent: 1.5 },
-  { raid: "R8.2", percent: 1.59 },
-  { raid: "R8.3", percent: 1.51 },
-  { raid: "R8.4", percent: 1.44 },
-  { raid: "R8.5", percent: 1.44 },
-  { raid: "R8.6", percent: 1.54 },
+type RaidPerformanceItem = {
+  raid: string;
+  memberCount: number;
+  percent: number;
+  totalDamage: number;
+  totalDamageJa: string;
+  damagePerMember: number;
+  damagePerMemberJa: string;
+};
+
+const raidPerformanceData: RaidPerformanceItem[] = [
+  {
+    raid: "R7.9",
+    memberCount: 27,
+    percent: 1.98,
+    totalDamage: 304400000000,
+    totalDamageJa: "3044億",
+    damagePerMember: 11274074074.07,
+    damagePerMemberJa: "約112.74億",
+  },
+  {
+    raid: "R7.10",
+    memberCount: 30,
+    percent: 1.73,
+    totalDamage: 387223000000,
+    totalDamageJa: "3872.23億",
+    damagePerMember: 12907433333.33,
+    damagePerMemberJa: "約129.07億",
+  },
+  {
+    raid: "R7.11",
+    memberCount: 30,
+    percent: 1.49,
+    totalDamage: 465327000000,
+    totalDamageJa: "4653.27億",
+    damagePerMember: 15510900000,
+    damagePerMemberJa: "約155.11億",
+  },
+  {
+    raid: "R7.12",
+    memberCount: 30,
+    percent: 1.44,
+    totalDamage: 655101000000,
+    totalDamageJa: "6551.01億",
+    damagePerMember: 21836700000,
+    damagePerMemberJa: "約218.37億",
+  },
+  {
+    raid: "R8.1",
+    memberCount: 30,
+    percent: 1.5,
+    totalDamage: 597638000000,
+    totalDamageJa: "5976.38億",
+    damagePerMember: 19921266666.67,
+    damagePerMemberJa: "約199.21億",
+  },
+  {
+    raid: "R8.2",
+    memberCount: 31,
+    percent: 1.59,
+    totalDamage: 618823000000,
+    totalDamageJa: "6188.23億",
+    damagePerMember: 19962032258.06,
+    damagePerMemberJa: "約199.62億",
+  },
+  {
+    raid: "R8.3",
+    memberCount: 31,
+    percent: 1.51,
+    totalDamage: 778918000000,
+    totalDamageJa: "7789.18億",
+    damagePerMember: 25126387096.77,
+    damagePerMemberJa: "約251.26億",
+  },
+  {
+    raid: "R8.4",
+    memberCount: 31,
+    percent: 1.44,
+    totalDamage: 853498000000,
+    totalDamageJa: "8534.98億",
+    damagePerMember: 27532193548.39,
+    damagePerMemberJa: "約275.32億",
+  },
+  {
+    raid: "R8.5",
+    memberCount: 32,
+    percent: 1.44,
+    totalDamage: 1068539000000,
+    totalDamageJa: "1兆685.39億",
+    damagePerMember: 33391843750,
+    damagePerMemberJa: "約333.92億",
+  },
+  {
+    raid: "R8.6",
+    memberCount: 32,
+    percent: 1.54,
+    totalDamage: 1046002000000,
+    totalDamageJa: "1兆460.02億",
+    damagePerMember: 32687562500,
+    damagePerMemberJa: "約326.88億",
+  },
 ];
+
+const recentRaidResults = raidPerformanceData.map((item) => ({
+  raid: item.raid,
+  percent: item.percent,
+}));
+
+const RAID_DAMAGE_UNIT = 100000000;
+
+function formatDamageInOku(value: number) {
+  return `${Math.round(value / RAID_DAMAGE_UNIT).toLocaleString()}億`;
+}
 
 type LevelTickProps = {
   x?: number;
@@ -333,6 +434,8 @@ function DashboardPage() {
   const maxSyncLevel = Math.max(...syncLevels);
   const bestPercent = Math.min(...recentRaidResults.map((r) => r.percent));
   const latestPercent = recentRaidResults[recentRaidResults.length - 1].percent;
+  const highestTotalDamage = Math.max(...raidPerformanceData.map((item) => item.totalDamage));
+  const latestRaidDamage = raidPerformanceData[raidPerformanceData.length - 1];
 
   const visualPath = `${import.meta.env.BASE_URL}images/union-visual.png`;
   const mascotGifPath = `${import.meta.env.BASE_URL}images/union-mascot.gif`;
@@ -636,6 +739,87 @@ function DashboardPage() {
                 </LineChart>
               </ResponsiveContainer>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-xl backdrop-blur-xl sm:p-6">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2 text-emerald-200">
+                <Swords className="h-5 w-5" />
+                <span className="text-sm font-semibold uppercase tracking-[0.2em]">
+                  Union Raid Total Damage
+                </span>
+              </div>
+              <h2 className="mt-2 text-2xl font-bold">ユニオンレイド総合ダメージ推移</h2>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+              <div className="grid grid-cols-2 gap-4 text-right">
+                <div>
+                  <div className="text-xs text-white/45">最高総合ダメージ</div>
+                  <div className="text-xl font-bold text-emerald-300">{formatDamageInOku(highestTotalDamage)}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-white/45">直近総合ダメージ</div>
+                  <div className="text-xl font-bold text-cyan-300">{latestRaidDamage.totalDamageJa}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="h-80 w-full rounded-2xl border border-emerald-300/15 bg-[linear-gradient(180deg,rgba(16,185,129,0.12),rgba(255,255,255,0.02))] p-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={raidPerformanceData}
+                margin={{ top: 20, right: 24, left: 12, bottom: 8 }}
+              >
+                <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
+                <XAxis
+                  dataKey="raid"
+                  tickLine={false}
+                  axisLine={false}
+                  interval={0}
+                  minTickGap={0}
+                  tick={(props) => <RaidAxisTick {...props} isMobile={isMobile} />}
+                  tickMargin={8}
+                  padding={{ left: 8, right: 16 }}
+                />
+                <YAxis
+                  stroke="rgba(255,255,255,0.6)"
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value: number) => `${Math.round(value / RAID_DAMAGE_UNIT)}億`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "rgba(9,11,17,0.95)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 16,
+                    color: "white",
+                  }}
+                  formatter={(value: number | string) => [
+                    formatDamageInOku(Number(value)),
+                    "総合ダメージ",
+                  ]}
+                  labelFormatter={(label, payload) => {
+                    const current = payload?.[0]?.payload as RaidPerformanceItem | undefined;
+                    if (!current) return String(label);
+                    return `${current.raid}  |  参加人数: ${current.memberCount}人  |  1人あたり: ${current.damagePerMemberJa}`;
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="totalDamage"
+                  stroke="rgba(52,211,153,0.95)"
+                  strokeWidth={3}
+                  dot={{ r: 4, strokeWidth: 2, fill: "#ffffff", stroke: "rgba(52,211,153,0.95)" }}
+                  activeDot={{ r: 7, strokeWidth: 2, fill: "#34d399", stroke: "#d1fae5" }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </section>
