@@ -93,19 +93,19 @@ const raidPerformanceData: RaidPerformanceItem[] = [
     raid: "R7.11",
     memberCount: 30,
     percent: 1.49,
-    totalDamage: 465327000000,
-    totalDamageJa: "4653.27億",
-    damagePerMember: 15510900000,
-    damagePerMemberJa: "約155.11億",
+    totalDamage: 450095000000,
+    totalDamageJa: "4500.95億",
+    damagePerMember: 15003166666.67,
+    damagePerMemberJa: "約150.03億",
   },
   {
     raid: "R7.12",
     memberCount: 30,
     percent: 1.44,
-    totalDamage: 655101000000,
-    totalDamageJa: "6551.01億",
-    damagePerMember: 21836700000,
-    damagePerMemberJa: "約218.37億",
+    totalDamage: 636321000000,
+    totalDamageJa: "6363.21億",
+    damagePerMember: 21210700000,
+    damagePerMemberJa: "約212.11億",
   },
   {
     raid: "R8.1",
@@ -129,37 +129,37 @@ const raidPerformanceData: RaidPerformanceItem[] = [
     raid: "R8.3",
     memberCount: 31,
     percent: 1.51,
-    totalDamage: 778918000000,
-    totalDamageJa: "7789.18億",
-    damagePerMember: 25126387096.77,
-    damagePerMemberJa: "約251.26億",
+    totalDamage: 779908000000,
+    totalDamageJa: "7799.08億",
+    damagePerMember: 25158322580.65,
+    damagePerMemberJa: "約251.58億",
   },
   {
     raid: "R8.4",
     memberCount: 31,
     percent: 1.44,
-    totalDamage: 853498000000,
-    totalDamageJa: "8534.98億",
-    damagePerMember: 27532193548.39,
-    damagePerMemberJa: "約275.32億",
+    totalDamage: 845317000000,
+    totalDamageJa: "8453.17億",
+    damagePerMember: 27268290322.58,
+    damagePerMemberJa: "約272.68億",
   },
   {
     raid: "R8.5",
     memberCount: 32,
     percent: 1.44,
-    totalDamage: 1068539000000,
-    totalDamageJa: "1兆685.39億",
-    damagePerMember: 33391843750,
-    damagePerMemberJa: "約333.92億",
+    totalDamage: 1018352000000,
+    totalDamageJa: "1兆183.52億",
+    damagePerMember: 31823500000,
+    damagePerMemberJa: "約318.24億",
   },
   {
     raid: "R8.6",
     memberCount: 32,
     percent: 1.54,
-    totalDamage: 1046002000000,
-    totalDamageJa: "1兆460.02億",
-    damagePerMember: 32687562500,
-    damagePerMemberJa: "約326.88億",
+    totalDamage: 1055529000000,
+    totalDamageJa: "1兆555.29億",
+    damagePerMember: 32985281250,
+    damagePerMemberJa: "約329.85億",
   },
 ];
 
@@ -835,48 +835,48 @@ function EventsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-Papa.parse<CsvRow>(`${import.meta.env.BASE_URL}data/events.csv`, {
-  download: true,
-  header: true,
-  skipEmptyLines: true,
-  transformHeader: (header) =>
-    header
-      .replace(/^\uFEFF/, "")
-      .replace(/\r\n/g, "\n")
-      .replace(/\r/g, "\n")
-      .trim(),
-  complete: (results: ParseResult<CsvRow>) => {
-    const parsed = results.data
-      .map((row: CsvRow): EventItem | null => {
-        const name = normalizeText(row["名称"]);
-        if (!name) return null;
-        
-        const status = normalizeStatus(row["未実装/実装"]);
-        const csvDaysToArchive = normalizeNumber(row["イベ終了からアーカイブ追加まで(日)"]);
-        
-        return {
-          status,
-          name,
-          startDate: parseDateLabel(row["イベ開始日"]),
-          endDate: parseDateLabel(row["イベ終了日"]),
-          archiveDate: parseDateLabel(row["アーカイブ追加日"]),
-          daysToArchive:
-            status === "implemented"
-              ? csvDaysToArchive ?? calcDaysToArchive(row["イベ終了日"], row["アーカイブ追加日"])
-              : null,
-          note: normalizeText(row["備考"]) || "—",
-        };
-      })
-      .filter((item: EventItem | null): item is EventItem => item !== null);
+    Papa.parse<CsvRow>(`${import.meta.env.BASE_URL}data/events.csv`, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      transformHeader: (header) =>
+        header
+          .replace(/^\uFEFF/, "")
+          .replace(/\r\n/g, "\n")
+          .replace(/\r/g, "\n")
+          .trim(),
+      complete: (results: ParseResult<CsvRow>) => {
+        const parsed = results.data
+          .map((row: CsvRow): EventItem | null => {
+            const name = normalizeText(row["名称"]);
+            if (!name) return null;
 
-    setEvents(parsed);
-    setLoading(false);
-  },
-  error: () => {
-    setEvents([]);
-    setLoading(false);
-  },
-});
+            const status = normalizeStatus(row["未実装/実装"]);
+            const csvDaysToArchive = normalizeNumber(row["イベ終了からアーカイブ追加まで(日)"]);
+
+            return {
+              status,
+              name,
+              startDate: parseDateLabel(row["イベ開始日"]),
+              endDate: parseDateLabel(row["イベ終了日"]),
+              archiveDate: parseDateLabel(row["アーカイブ追加日"]),
+              daysToArchive:
+                status === "implemented"
+                  ? csvDaysToArchive ?? calcDaysToArchive(row["イベ終了日"], row["アーカイブ追加日"])
+                  : null,
+              note: normalizeText(row["備考"]) || "—",
+            };
+          })
+          .filter((item: EventItem | null): item is EventItem => item !== null);
+
+        setEvents(parsed);
+        setLoading(false);
+      },
+      error: () => {
+        setEvents([]);
+        setLoading(false);
+      },
+    });
   }, []);
 
   const stats = useMemo(() => {
@@ -932,9 +932,9 @@ Papa.parse<CsvRow>(`${import.meta.env.BASE_URL}data/events.csv`, {
               <div className="text-sm font-semibold uppercase tracking-[0.2em]">Event List</div>
             </div>
             <h1 className="mt-2 text-3xl font-black text-white sm:text-4xl">イベント一覧</h1>
-              <p className="mt-2 text-sm leading-6 text-white/60">
-                アーカイブ実装状況、イベント開催期間、アーカイブ追加日を一覧で確認できます。
-              </p>
+            <p className="mt-2 text-sm leading-6 text-white/60">
+              アーカイブ実装状況、イベント開催期間、アーカイブ追加日を一覧で確認できます。
+            </p>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
