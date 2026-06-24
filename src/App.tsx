@@ -511,7 +511,7 @@ function DashboardPage() {
                   <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4">
                     <div className="text-sm font-semibold text-white">ユニオンレイドの進め方</div>
                     <p className="mt-1 text-xs leading-5 text-white/62">
-                      ノーマルは早い者勝ち、ハードは全員参加で時間指定あり。凸指定はありません。
+                      ノーマルは早い者勝ち、優先時間は設けないですがハードは3凸完遂をお願いします。
                     </p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4">
