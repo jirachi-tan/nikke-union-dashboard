@@ -29,21 +29,29 @@ import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
 import Papa from "papaparse";
 import type { ParseResult } from "papaparse";
 
-const unionInfo = {
-  name: "PEACH",
-  id: "12894",
-  currentMembers: 30,
-  maxMembers: 32,
-  recruitmentStatus: "募集中",
+type UnionProfile = {
+  name: string;
+  id: string;
+  maxMembers: number;
+};
+
+type SyncLevelSnapshot = {
+  period: string;
+  recordedAt: string;
+  levels: number[];
+  source?: string;
+  note?: string;
+};
+
+type SyncLevelHistory = {
+  snapshots: SyncLevelSnapshot[];
+};
+
+const unionStatus = {
+  recruitmentStatus: "満員",
 };
 
 const removalRules = ["未ログイン3日以上", "ハード戦無凸"];
-
-const syncLevels = [
-  726, 723, 722, 710, 705, 703, 688, 684, 680, 653,
-  652, 633, 626, 622, 615, 610, 601, 590, 585, 573,
-  560, 480, 442, 415, 406, 360, 352, 310, 299, 421,
-];
 
 const levelBins = [
   { range: "100-199", min: 100, max: 199 },
@@ -54,11 +62,6 @@ const levelBins = [
   { range: "600-699", min: 600, max: 699 },
   { range: "700-799", min: 700, max: 799 },
 ];
-
-const levelDistribution = levelBins.map((bin) => ({
-  range: bin.range,
-  members: syncLevels.filter((level) => level >= bin.min && level <= bin.max).length,
-}));
 
 type RaidPerformanceItem = {
   raid: string;
@@ -160,6 +163,24 @@ const raidPerformanceData: RaidPerformanceItem[] = [
     totalDamageJa: "1兆555.29億",
     damagePerMember: 32985281250,
     damagePerMemberJa: "約329.85億",
+  },
+  {
+    raid: "R8.7",
+    memberCount: 30,
+    percent: 1.44,
+    totalDamage: 1162781000000,
+    totalDamageJa: "1兆1627.81億",
+    damagePerMember: 38759366667,
+    damagePerMemberJa: "約387.59億",
+  },
+  {
+    raid: "R8.8",
+    memberCount: 32,
+    percent: 1.33,
+    totalDamage: 1321861000000,
+    totalDamageJa: "1兆3218.61億",
+    damagePerMember: 41308156250,
+    damagePerMemberJa: "約413.08億",
   },
 ];
 
@@ -428,10 +449,55 @@ function Shell({ children }: { children: React.ReactNode }) {
 }
 
 function DashboardPage() {
-  const avgSyncLevel = Math.round(
-    syncLevels.reduce((sum, level) => sum + level, 0) / Math.max(syncLevels.length, 1)
-  );
-  const maxSyncLevel = Math.max(...syncLevels);
+  const [unionProfile, setUnionProfile] = useState<UnionProfile | null>(null);
+  const [syncLevelHistory, setSyncLevelHistory] = useState<SyncLevelHistory | null>(null);
+  const [syncLevelError, setSyncLevelError] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const dataPath = `${import.meta.env.BASE_URL}data/`;
+
+    async function loadUnionData() {
+      try {
+        const [profileResponse, historyResponse] = await Promise.all([
+          fetch(`${dataPath}union-profile.json`, { signal: controller.signal }),
+          fetch(`${dataPath}sync-level-history.json`, { signal: controller.signal }),
+        ]);
+
+        if (!profileResponse.ok || !historyResponse.ok) throw new Error("Failed to load union data");
+
+        const [profile, history] = (await Promise.all([
+          profileResponse.json(),
+          historyResponse.json(),
+        ])) as [UnionProfile, SyncLevelHistory];
+
+        if (!Array.isArray(history.snapshots)) throw new Error("Invalid sync level history");
+
+        setUnionProfile(profile);
+        setSyncLevelHistory(history);
+      } catch (error) {
+        if (!controller.signal.aborted) setSyncLevelError(true);
+      }
+    }
+
+    void loadUnionData();
+    return () => controller.abort();
+  }, []);
+
+  const latestSyncSnapshot = syncLevelHistory?.snapshots
+    .slice()
+    .sort((left, right) => `${right.period}-${right.recordedAt}`.localeCompare(`${left.period}-${left.recordedAt}`))[0];
+  const syncLevels = latestSyncSnapshot?.levels ?? [];
+  const currentMembers = syncLevels.length;
+  const levelDistribution = levelBins.map((bin) => ({
+    range: bin.range,
+    members: syncLevels.filter((level) => level >= bin.min && level <= bin.max).length,
+  }));
+  const avgSyncLevel = syncLevels.length
+    ? Math.round(syncLevels.reduce((sum, level) => sum + level, 0) / syncLevels.length)
+    : null;
+  const maxSyncLevel = syncLevels.length ? Math.max(...syncLevels) : null;
   const bestPercent = Math.min(...recentRaidResults.map((r) => r.percent));
   const latestPercent = recentRaidResults[recentRaidResults.length - 1].percent;
   const highestTotalDamage = Math.max(...raidPerformanceData.map((item) => item.totalDamage));
@@ -439,8 +505,6 @@ function DashboardPage() {
 
   const visualPath = `${import.meta.env.BASE_URL}images/union-visual.png`;
   const mascotGifPath = `${import.meta.env.BASE_URL}images/union-mascot.gif`;
-
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const update = () => setIsMobile(window.innerWidth < 640);
@@ -463,19 +527,19 @@ function DashboardPage() {
                 NIKKE UNION DASHBOARD
               </div>
               <div className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-sm text-cyan-200">
-                ※2026/6/24時点の情報参照
+                ※{latestSyncSnapshot ? latestSyncSnapshot.recordedAt.replace(/-/g, "/") : "データ読込中"}時点の情報参照
               </div>
             </div>
 
             <div className="rounded-3xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-6">
               <p className="text-sm uppercase tracking-[0.28em] text-white/45">Union Profile</p>
               <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <h1 className="text-5xl font-black tracking-tight sm:text-6xl">{unionInfo.name}</h1>
+                <h1 className="text-5xl font-black tracking-tight sm:text-6xl">{unionProfile?.name ?? "-"}</h1>
 
                 <div className="inline-flex items-center gap-3 self-start rounded-2xl border border-white/10 bg-black/25 px-5 py-4 sm:mt-1">
                   <div className="text-xs uppercase tracking-[0.18em] text-white/45">Union ID</div>
                   <div className="text-2xl font-black tracking-[0.12em] text-white sm:text-3xl">
-                    {unionInfo.id}
+                    {unionProfile?.id ?? "-"}
                   </div>
                 </div>
               </div>
@@ -485,18 +549,18 @@ function DashboardPage() {
                 <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
                   <div>
                     <div className="text-3xl font-black text-white">
-                      {unionInfo.currentMembers}
-                      <span className="text-lg text-white/55"> / {unionInfo.maxMembers}</span>
+                      {currentMembers || "-"}
+                      <span className="text-lg text-white/55"> / {unionProfile?.maxMembers ?? "-"}</span>
                     </div>
                     <div className="mt-1 text-sm text-white/62">現在の在籍メンバー数</div>
                   </div>
 
                   <div className="flex flex-col items-start gap-2 sm:items-end">
                     <div className="rounded-full border border-[#f6b44b]/30 bg-[#f6b44b]/10 px-3 py-1 text-sm font-semibold text-[#ffd38b]">
-                      {unionInfo.recruitmentStatus}
+                      {unionStatus.recruitmentStatus}
                     </div>
                     <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-white/78">
-                      募集人数：{unionInfo.maxMembers - unionInfo.currentMembers}名
+                      募集人数：{unionProfile ? unionProfile.maxMembers - currentMembers : "-"}名
                     </div>
                   </div>
                 </div>
@@ -616,15 +680,19 @@ function DashboardPage() {
                 <div className="grid grid-cols-2 gap-4 text-right">
                   <div>
                     <div className="text-xs text-white/45">平均シンクロLv</div>
-                    <div className="text-xl font-bold">{avgSyncLevel}</div>
+                    <div className="text-xl font-bold">{avgSyncLevel ?? "-"}</div>
                   </div>
                   <div>
                     <div className="text-xs text-white/45">最高シンクロLv</div>
-                    <div className="text-xl font-bold text-[#ffd38b]">{maxSyncLevel}</div>
+                    <div className="text-xl font-bold text-[#ffd38b]">{maxSyncLevel ?? "-"}</div>
                   </div>
                 </div>
               </div>
             </div>
+
+            {syncLevelError && (
+              <p className="mb-4 text-sm text-amber-200">シンクロレベルデータを読み込めませんでした。</p>
+            )}
 
             <div className="h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">

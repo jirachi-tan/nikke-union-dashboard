@@ -22,6 +22,9 @@ GitHub Pages のような静的ホスティングでも比較的そのまま動�
 public/images/union-visual.png
 ```
 
+### ユニオンデータの更新
+公開する基本データは `public/data` に保存します。シンクロレベルなどの時系列データは、既存の履歴を上書きせず新しい記録を追記してください。形式と更新ルールは [public/data/README.md](public/data/README.md) を参照してください。
+
 ### 公開方法の一例
 ```bash
 npm install
