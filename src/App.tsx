@@ -816,13 +816,18 @@ function DashboardPage() {
             {raidResultsError ? (
               <p className="text-sm text-amber-200">レイド進捗データを読み込めませんでした。</p>
             ) : (
-              <div className="overflow-x-auto rounded-2xl border border-white/10">
-                <table className="min-w-[560px] w-full border-collapse text-left">
+              <div className="overflow-hidden rounded-2xl border border-white/10">
+                <table className="w-full table-fixed border-collapse text-left">
+                  <colgroup>
+                    <col className="w-[19%] sm:w-[18%]" />
+                    <col className="w-[27%] sm:w-[22%]" />
+                    <col className="w-[54%] sm:w-[60%]" />
+                  </colgroup>
                   <thead className="bg-white/[0.04] text-xs uppercase tracking-[0.16em] text-white/45">
                     <tr>
-                      <th className="px-4 py-3 font-medium">レイド</th>
-                      <th className="px-4 py-3 font-medium">最終到達Lv</th>
-                      <th className="px-4 py-3 font-medium">ボスHP</th>
+                      <th className="px-2 py-3 font-medium sm:px-4">レイド</th>
+                      <th className="px-2 py-3 font-medium sm:px-4">最終到達Lv</th>
+                      <th className="px-2 py-3 font-medium sm:px-4">ボスHP</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
@@ -840,23 +845,23 @@ function DashboardPage() {
 
                       return (
                         <tr key={item.raid} className={progress ? "bg-white/[0.02]" : "bg-black/10 text-white/35"}>
-                          <td className="px-4 py-3 font-semibold text-white">{item.raid}</td>
-                          <td className="px-4 py-3">
+                          <td className="px-2 py-3 font-semibold text-white sm:px-4">{item.raid}</td>
+                          <td className="px-2 py-3 sm:px-4">
                             {progress ? (
-                              <span className={`inline-flex min-w-[82px] flex-col rounded-lg border px-3 py-1.5 ${levelClassName}`}>
-                                <span className="text-[9px] font-semibold tracking-[0.16em] opacity-70">BOSS</span>
-                                <span className="text-lg font-black leading-5">Lv.{progress.reachedLevel}</span>
+                              <span className={`inline-flex min-w-[58px] flex-col rounded-md border px-1.5 py-1 sm:min-w-[82px] sm:rounded-lg sm:px-3 sm:py-1.5 ${levelClassName}`}>
+                                <span className="text-[8px] font-semibold tracking-[0.1em] opacity-70 sm:text-[9px] sm:tracking-[0.16em]">BOSS</span>
+                                <span className="text-base font-black leading-5 sm:text-lg">Lv.{progress.reachedLevel}</span>
                               </span>
                             ) : "—"}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-2 py-3 sm:px-4">
                             {progress ? (
-                              <div className="min-w-[300px]">
-                                <div className="mb-2 flex items-center justify-between text-xs font-semibold tabular-nums">
+                              <div>
+                                <div className="mb-1.5 flex flex-col gap-0.5 text-[10px] font-semibold tabular-nums sm:mb-2 sm:flex-row sm:items-center sm:justify-between sm:text-xs">
                                   <span className="text-emerald-200">撃破済み {defeatedPercent.toFixed(2)}%</span>
                                   <span className="text-white/55">残りHP {remainingPercent.toFixed(2)}%</span>
                                 </div>
-                                <div className="h-3 overflow-hidden rounded-full border border-white/10 bg-white/[0.08]">
+                                <div className="h-2 overflow-hidden rounded-full border border-white/10 bg-white/[0.08] sm:h-3">
                                   <div
                                     className={`h-full rounded-full ${progressBarClassName}`}
                                     style={{ width: `${defeatedPercent}%` }}
