@@ -12,6 +12,7 @@ import {
   Filter,
   Clock3,
   Sparkles,
+  Target,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -71,123 +72,15 @@ type RaidPerformanceItem = {
   totalDamageJa: string;
   damagePerMember: number;
   damagePerMemberJa: string;
+  bossProgress?: {
+    reachedLevel: number;
+    progressPercent: number;
+  };
 };
 
-const raidPerformanceData: RaidPerformanceItem[] = [
-  {
-    raid: "R7.9",
-    memberCount: 27,
-    percent: 1.98,
-    totalDamage: 304400000000,
-    totalDamageJa: "3044億",
-    damagePerMember: 11274074074.07,
-    damagePerMemberJa: "約112.74億",
-  },
-  {
-    raid: "R7.10",
-    memberCount: 30,
-    percent: 1.73,
-    totalDamage: 387223000000,
-    totalDamageJa: "3872.23億",
-    damagePerMember: 12907433333.33,
-    damagePerMemberJa: "約129.07億",
-  },
-  {
-    raid: "R7.11",
-    memberCount: 30,
-    percent: 1.49,
-    totalDamage: 450095000000,
-    totalDamageJa: "4500.95億",
-    damagePerMember: 15003166666.67,
-    damagePerMemberJa: "約150.03億",
-  },
-  {
-    raid: "R7.12",
-    memberCount: 30,
-    percent: 1.44,
-    totalDamage: 636321000000,
-    totalDamageJa: "6363.21億",
-    damagePerMember: 21210700000,
-    damagePerMemberJa: "約212.11億",
-  },
-  {
-    raid: "R8.1",
-    memberCount: 30,
-    percent: 1.5,
-    totalDamage: 597638000000,
-    totalDamageJa: "5976.38億",
-    damagePerMember: 19921266666.67,
-    damagePerMemberJa: "約199.21億",
-  },
-  {
-    raid: "R8.2",
-    memberCount: 31,
-    percent: 1.59,
-    totalDamage: 618823000000,
-    totalDamageJa: "6188.23億",
-    damagePerMember: 19962032258.06,
-    damagePerMemberJa: "約199.62億",
-  },
-  {
-    raid: "R8.3",
-    memberCount: 31,
-    percent: 1.51,
-    totalDamage: 779908000000,
-    totalDamageJa: "7799.08億",
-    damagePerMember: 25158322580.65,
-    damagePerMemberJa: "約251.58億",
-  },
-  {
-    raid: "R8.4",
-    memberCount: 31,
-    percent: 1.44,
-    totalDamage: 845317000000,
-    totalDamageJa: "8453.17億",
-    damagePerMember: 27268290322.58,
-    damagePerMemberJa: "約272.68億",
-  },
-  {
-    raid: "R8.5",
-    memberCount: 32,
-    percent: 1.44,
-    totalDamage: 1018352000000,
-    totalDamageJa: "1兆183.52億",
-    damagePerMember: 31823500000,
-    damagePerMemberJa: "約318.24億",
-  },
-  {
-    raid: "R8.6",
-    memberCount: 32,
-    percent: 1.54,
-    totalDamage: 1055529000000,
-    totalDamageJa: "1兆555.29億",
-    damagePerMember: 32985281250,
-    damagePerMemberJa: "約329.85億",
-  },
-  {
-    raid: "R8.7",
-    memberCount: 30,
-    percent: 1.44,
-    totalDamage: 1162781000000,
-    totalDamageJa: "1兆1627.81億",
-    damagePerMember: 38759366667,
-    damagePerMemberJa: "約387.59億",
-  },
-  {
-    raid: "R8.8",
-    memberCount: 32,
-    percent: 1.33,
-    totalDamage: 1321861000000,
-    totalDamageJa: "1兆3218.61億",
-    damagePerMember: 41308156250,
-    damagePerMemberJa: "約413.08億",
-  },
-];
-
-const recentRaidResults = raidPerformanceData.map((item) => ({
-  raid: item.raid,
-  percent: item.percent,
-}));
+type RaidResultsData = {
+  results: RaidPerformanceItem[];
+};
 
 const RAID_DAMAGE_UNIT = 100000000;
 
@@ -245,13 +138,13 @@ type RaidDotProps = {
   cx?: number;
   cy?: number;
   payload?: { percent: number };
+  bestPercent?: number;
 };
 
-function CustomRaidDot({ cx, cy, payload }: RaidDotProps) {
+function CustomRaidDot({ cx, cy, payload, bestPercent }: RaidDotProps) {
   if (cx == null || cy == null || !payload) return null;
 
-  const best = Math.min(...recentRaidResults.map((r) => r.percent));
-  const isBest = payload.percent === best;
+  const isBest = payload.percent === bestPercent;
 
   if (isBest) {
     const points = [
@@ -451,7 +344,9 @@ function Shell({ children }: { children: React.ReactNode }) {
 function DashboardPage() {
   const [unionProfile, setUnionProfile] = useState<UnionProfile | null>(null);
   const [syncLevelHistory, setSyncLevelHistory] = useState<SyncLevelHistory | null>(null);
+  const [raidResultsData, setRaidResultsData] = useState<RaidResultsData | null>(null);
   const [syncLevelError, setSyncLevelError] = useState(false);
+  const [raidResultsError, setRaidResultsError] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -460,24 +355,34 @@ function DashboardPage() {
 
     async function loadUnionData() {
       try {
-        const [profileResponse, historyResponse] = await Promise.all([
+        const [profileResponse, historyResponse, raidResultsResponse] = await Promise.all([
           fetch(`${dataPath}union-profile.json`, { signal: controller.signal }),
           fetch(`${dataPath}sync-level-history.json`, { signal: controller.signal }),
+          fetch(`${dataPath}raid-results.json`, { signal: controller.signal }),
         ]);
 
-        if (!profileResponse.ok || !historyResponse.ok) throw new Error("Failed to load union data");
+        if (!profileResponse.ok || !historyResponse.ok || !raidResultsResponse.ok) {
+          throw new Error("Failed to load union data");
+        }
 
-        const [profile, history] = (await Promise.all([
+        const [profile, history, raidResults] = (await Promise.all([
           profileResponse.json(),
           historyResponse.json(),
-        ])) as [UnionProfile, SyncLevelHistory];
+          raidResultsResponse.json(),
+        ])) as [UnionProfile, SyncLevelHistory, RaidResultsData];
 
-        if (!Array.isArray(history.snapshots)) throw new Error("Invalid sync level history");
+        if (!Array.isArray(history.snapshots) || !Array.isArray(raidResults.results)) {
+          throw new Error("Invalid union data");
+        }
 
         setUnionProfile(profile);
         setSyncLevelHistory(history);
+        setRaidResultsData(raidResults);
       } catch (error) {
-        if (!controller.signal.aborted) setSyncLevelError(true);
+        if (!controller.signal.aborted) {
+          setSyncLevelError(true);
+          setRaidResultsError(true);
+        }
       }
     }
 
@@ -498,10 +403,19 @@ function DashboardPage() {
     ? Math.round(syncLevels.reduce((sum, level) => sum + level, 0) / syncLevels.length)
     : null;
   const maxSyncLevel = syncLevels.length ? Math.max(...syncLevels) : null;
-  const bestPercent = Math.min(...recentRaidResults.map((r) => r.percent));
-  const latestPercent = recentRaidResults[recentRaidResults.length - 1].percent;
-  const highestTotalDamage = Math.max(...raidPerformanceData.map((item) => item.totalDamage));
-  const latestRaidDamage = raidPerformanceData[raidPerformanceData.length - 1];
+  const raidPerformanceData = raidResultsData?.results ?? [];
+  const recentRaidResults = raidPerformanceData.map((item) => ({
+    raid: item.raid,
+    percent: item.percent,
+  }));
+  const bestPercent = recentRaidResults.length
+    ? Math.min(...recentRaidResults.map((result) => result.percent))
+    : null;
+  const latestPercent = recentRaidResults[recentRaidResults.length - 1]?.percent ?? null;
+  const highestTotalDamage = raidPerformanceData.length
+    ? Math.max(...raidPerformanceData.map((item) => item.totalDamage))
+    : null;
+  const latestRaidDamage = raidPerformanceData[raidPerformanceData.length - 1] ?? null;
 
   const visualPath = `${import.meta.env.BASE_URL}images/union-visual.png`;
   const mascotGifPath = `${import.meta.env.BASE_URL}images/union-mascot.gif`;
@@ -750,11 +664,11 @@ function DashboardPage() {
                 <div className="grid grid-cols-2 gap-4 text-right">
                   <div>
                     <div className="text-xs text-white/45">最高成績</div>
-                    <div className="text-xl font-bold">TOP {bestPercent.toFixed(2)}%</div>
+                    <div className="text-xl font-bold">{bestPercent == null ? "-" : `TOP ${bestPercent.toFixed(2)}%`}</div>
                   </div>
                   <div>
                     <div className="text-xs text-white/45">直近成績</div>
-                    <div className="text-xl font-bold text-cyan-300">TOP {latestPercent.toFixed(2)}%</div>
+                    <div className="text-xl font-bold text-cyan-300">{latestPercent == null ? "-" : `TOP ${latestPercent.toFixed(2)}%`}</div>
                   </div>
                 </div>
               </div>
@@ -802,7 +716,7 @@ function DashboardPage() {
                     dataKey="percent"
                     stroke="rgba(103,232,249,0.95)"
                     strokeWidth={3}
-                    dot={<CustomRaidDot />}
+                    dot={(props) => <CustomRaidDot {...props} bestPercent={bestPercent ?? undefined} />}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -828,11 +742,11 @@ function DashboardPage() {
               <div className="grid grid-cols-2 gap-4 text-right">
                 <div>
                   <div className="text-xs text-white/45">最高総合ダメージ</div>
-                  <div className="text-xl font-bold text-emerald-300">{formatDamageInOku(highestTotalDamage)}</div>
+                  <div className="text-xl font-bold text-emerald-300">{highestTotalDamage == null ? "-" : formatDamageInOku(highestTotalDamage)}</div>
                 </div>
                 <div>
                   <div className="text-xs text-white/45">直近総合ダメージ</div>
-                  <div className="text-xl font-bold text-cyan-300">{latestRaidDamage.totalDamageJa}</div>
+                  <div className="text-xl font-bold text-cyan-300">{latestRaidDamage?.totalDamageJa ?? "-"}</div>
                 </div>
               </div>
             </div>
@@ -888,6 +802,76 @@ function DashboardPage() {
                 />
               </LineChart>
             </ResponsiveContainer>
+          </div>
+
+          <div className="mt-6 border-t border-white/10 pt-6">
+            <div className="mb-4 flex items-center gap-2 text-cyan-200">
+              <Target className="h-5 w-5" />
+              <div>
+                <div className="text-sm font-semibold uppercase tracking-[0.2em]">Boss Progression</div>
+                <h3 className="mt-1 text-xl font-bold text-white">ボス到達進捗</h3>
+              </div>
+            </div>
+
+            {raidResultsError ? (
+              <p className="text-sm text-amber-200">レイド進捗データを読み込めませんでした。</p>
+            ) : (
+              <div className="overflow-x-auto rounded-2xl border border-white/10">
+                <table className="min-w-[560px] w-full border-collapse text-left">
+                  <thead className="bg-white/[0.04] text-xs uppercase tracking-[0.16em] text-white/45">
+                    <tr>
+                      <th className="px-4 py-3 font-medium">レイド</th>
+                      <th className="px-4 py-3 font-medium">最終到達Lv</th>
+                      <th className="px-4 py-3 font-medium">ボスHP</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {raidPerformanceData.map((item) => {
+                      const progress = item.bossProgress;
+                      const isLevelTwoOrHigher = (progress?.reachedLevel ?? 0) >= 2;
+                      const levelClassName = isLevelTwoOrHigher
+                        ? "border-amber-300/35 bg-amber-300/10 text-amber-100"
+                        : "border-cyan-300/35 bg-cyan-300/10 text-cyan-100";
+                      const progressBarClassName = isLevelTwoOrHigher
+                        ? "bg-[linear-gradient(90deg,#f59e0b,#fcd34d)] shadow-[0_0_12px_rgba(245,158,11,0.45)]"
+                        : "bg-[linear-gradient(90deg,#22d3ee,#34d399)] shadow-[0_0_12px_rgba(34,211,238,0.45)]";
+                      const defeatedPercent = progress?.progressPercent ?? 0;
+                      const remainingPercent = 100 - defeatedPercent;
+
+                      return (
+                        <tr key={item.raid} className={progress ? "bg-white/[0.02]" : "bg-black/10 text-white/35"}>
+                          <td className="px-4 py-3 font-semibold text-white">{item.raid}</td>
+                          <td className="px-4 py-3">
+                            {progress ? (
+                              <span className={`inline-flex min-w-[82px] flex-col rounded-lg border px-3 py-1.5 ${levelClassName}`}>
+                                <span className="text-[9px] font-semibold tracking-[0.16em] opacity-70">BOSS</span>
+                                <span className="text-lg font-black leading-5">Lv.{progress.reachedLevel}</span>
+                              </span>
+                            ) : "—"}
+                          </td>
+                          <td className="px-4 py-3">
+                            {progress ? (
+                              <div className="min-w-[300px]">
+                                <div className="mb-2 flex items-center justify-between text-xs font-semibold tabular-nums">
+                                  <span className="text-emerald-200">撃破済み {defeatedPercent.toFixed(2)}%</span>
+                                  <span className="text-white/55">残りHP {remainingPercent.toFixed(2)}%</span>
+                                </div>
+                                <div className="h-3 overflow-hidden rounded-full border border-white/10 bg-white/[0.08]">
+                                  <div
+                                    className={`h-full rounded-full ${progressBarClassName}`}
+                                    style={{ width: `${defeatedPercent}%` }}
+                                  />
+                                </div>
+                              </div>
+                            ) : "—"}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </section>

@@ -27,4 +27,13 @@ Contains `snapshots`. Each snapshot has:
 
 To add a new record, append a snapshot. If there are multiple records for the same month, the dashboard uses the record with the latest `recordedAt`.
 
-Future time-series data should use a separate file by domain, such as `raid-results.json`, `membership-history.json`, or `activity-history.json`.
+### `raid-results.json`
+
+Contains one result record per union raid. Record the existing raid score fields and, when available, add `bossProgress`:
+
+- `reachedLevel`: the final boss level being challenged when the raid ended
+- `progressPercent`: progression on that boss level, from 0 to 100
+
+Do not add `bossProgress` for raids with unavailable data. The dashboard displays these records as `—`, rather than treating them as unattempted or failed.
+
+Future time-series data should use a separate file by domain, such as `membership-history.json` or `activity-history.json`.

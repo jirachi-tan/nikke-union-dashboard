@@ -1,0 +1,144 @@
+{
+    "results": [
+        {
+            "raid": "R7.9",
+            "memberCount": 27,
+            "percent": 1.98,
+            "totalDamage": 304400000000,
+            "totalDamageJa": "3044億",
+            "damagePerMember": 11274074074.07,
+            "damagePerMemberJa": "約112.74億"
+        },
+        {
+            "raid": "R7.10",
+            "memberCount": 30,
+            "percent": 1.73,
+            "totalDamage": 387223000000,
+            "totalDamageJa": "3872.23億",
+            "damagePerMember": 12907433333.33,
+            "damagePerMemberJa": "約129.07億"
+        },
+        {
+            "raid": "R7.11",
+            "memberCount": 30,
+            "percent": 1.49,
+            "totalDamage": 450095000000,
+            "totalDamageJa": "4500.95億",
+            "damagePerMember": 15003166666.67,
+            "damagePerMemberJa": "約150.03億"
+        },
+        {
+            "raid": "R7.12",
+            "memberCount": 30,
+            "percent": 1.44,
+            "totalDamage": 636321000000,
+            "totalDamageJa": "6363.21億",
+            "damagePerMember": 21210700000,
+            "damagePerMemberJa": "約212.11億"
+        },
+        {
+            "raid": "R8.1",
+            "memberCount": 30,
+            "percent": 1.5,
+            "totalDamage": 597638000000,
+            "totalDamageJa": "5976.38億",
+            "damagePerMember": 19921266666.67,
+            "damagePerMemberJa": "約199.21億",
+            "bossProgress": {
+                "reachedLevel": 1,
+                "progressPercent": 93.57
+            }
+        },
+        {
+            "raid": "R8.2",
+            "memberCount": 31,
+            "percent": 1.59,
+            "totalDamage": 618823000000,
+            "totalDamageJa": "6188.23億",
+            "damagePerMember": 19962032258.06,
+            "damagePerMemberJa": "約199.62億",
+            "bossProgress": {
+                "reachedLevel": 1,
+                "progressPercent": 97.09
+            }
+        },
+        {
+            "raid": "R8.3",
+            "memberCount": 31,
+            "percent": 1.51,
+            "totalDamage": 779908000000,
+            "totalDamageJa": "7799.08億",
+            "damagePerMember": 25158322580.65,
+            "damagePerMemberJa": "約251.58億",
+            "bossProgress": {
+                "reachedLevel": 2,
+                "progressPercent": 15.88
+            }
+        },
+        {
+            "raid": "R8.4",
+            "memberCount": 31,
+            "percent": 1.44,
+            "totalDamage": 845317000000,
+            "totalDamageJa": "8453.17億",
+            "damagePerMember": 27268290322.58,
+            "damagePerMemberJa": "約272.68億",
+            "bossProgress": {
+                "reachedLevel": 2,
+                "progressPercent": 23.17
+            }
+        },
+        {
+            "raid": "R8.5",
+            "memberCount": 32,
+            "percent": 1.44,
+            "totalDamage": 1018352000000,
+            "totalDamageJa": "1兆183.52億",
+            "damagePerMember": 31823500000,
+            "damagePerMemberJa": "約318.24億",
+            "bossProgress": {
+                "reachedLevel": 2,
+                "progressPercent": 42.36
+            }
+        },
+        {
+            "raid": "R8.6",
+            "memberCount": 32,
+            "percent": 1.54,
+            "totalDamage": 1055529000000,
+            "totalDamageJa": "1兆555.29億",
+            "damagePerMember": 32985281250,
+            "damagePerMemberJa": "約329.85億",
+            "bossProgress": {
+                "reachedLevel": 2,
+                "progressPercent": 46.48
+            }
+        },
+        {
+            "raid": "R8.7",
+            "memberCount": 30,
+            "percent": 1.44,
+            "totalDamage": 1162781000000,
+            "totalDamageJa": "1兆1627.81億",
+            "damagePerMember": 38759366667,
+            "damagePerMemberJa": "約387.59億",
+            "bossProgress": {
+                "reachedLevel": 2,
+                "progressPercent": 58.37
+            }
+        },
+        {
+            "raid": "R8.8",
+            "memberCount": 32,
+            "percent": 1.33,
+            "totalDamage": 1321861000000,
+            "totalDamageJa": "1兆3218.61億",
+            "damagePerMember": 41308156250,
+            "damagePerMemberJa": "約413.08億",
+            "bossProgress": {
+                "reachedLevel": 2,
+                "progressPercent": 76.01
+            }
+        }
+    ]
+}
