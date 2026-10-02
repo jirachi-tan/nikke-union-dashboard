@@ -773,7 +773,11 @@ function DashboardPage() {
                   stroke="rgba(255,255,255,0.6)"
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value: number) => `${Math.round(value / RAID_DAMAGE_UNIT)}億`}
+                  tickFormatter={(value: number) =>
+                    value >= 1000000000000
+                      ? `${(value / 1000000000000).toFixed(1)}兆`
+                      : `${Math.round(value / RAID_DAMAGE_UNIT)}億`
+                  }
                 />
                 <Tooltip
                   contentStyle={{
