@@ -152,6 +152,19 @@
                 "reachedLevel": 2,
                 "progressPercent": 82.85
             }
+        },
+        {
+            "raid": "R8.10",
+            "memberCount": 32,
+            "percent": 1.14,
+            "totalDamage": 1550081000000,
+            "totalDamageJa": "1兆5500.81億",
+            "damagePerMember": 48440031250,
+            "damagePerMemberJa": "約484.40億",
+            "bossProgress": {
+                "reachedLevel": 3,
+                "progressPercent": 0.75
+            }
         }
     ]
 }

@@ -62,6 +62,7 @@ const levelBins = [
   { range: "500-599", min: 500, max: 599 },
   { range: "600-699", min: 600, max: 699 },
   { range: "700-799", min: 700, max: 799 },
+  { range: "800-899", min: 800, max: 899 },
 ];
 
 type RaidPerformanceItem = {
@@ -696,7 +697,7 @@ function DashboardPage() {
                     tickLine={false}
                     axisLine={false}
                     reversed
-                    domain={[2.1, 1.3]}
+                    domain={[2.1, 1.0]}
                     tickFormatter={(value: number) => `${value.toFixed(1)}%`}
                   />
                   <Tooltip
@@ -837,13 +838,19 @@ function DashboardPage() {
                   <tbody className="divide-y divide-white/10">
                     {raidPerformanceData.map((item) => {
                       const progress = item.bossProgress;
-                      const isLevelTwoOrHigher = (progress?.reachedLevel ?? 0) >= 2;
-                      const levelClassName = isLevelTwoOrHigher
-                        ? "border-amber-300/35 bg-amber-300/10 text-amber-100"
-                        : "border-cyan-300/35 bg-cyan-300/10 text-cyan-100";
-                      const progressBarClassName = isLevelTwoOrHigher
-                        ? "bg-[linear-gradient(90deg,#f59e0b,#fcd34d)] shadow-[0_0_12px_rgba(245,158,11,0.45)]"
-                        : "bg-[linear-gradient(90deg,#22d3ee,#34d399)] shadow-[0_0_12px_rgba(34,211,238,0.45)]";
+                      const reachedLevel = progress?.reachedLevel ?? 0;
+                      const levelClassName =
+                        reachedLevel >= 3
+                          ? "border-rose-300/35 bg-rose-300/10 text-rose-100"
+                          : reachedLevel === 2
+                            ? "border-amber-300/35 bg-amber-300/10 text-amber-100"
+                            : "border-cyan-300/35 bg-cyan-300/10 text-cyan-100";
+                      const progressBarClassName =
+                        reachedLevel >= 3
+                          ? "bg-[linear-gradient(90deg,#f43f5e,#fda4af)] shadow-[0_0_12px_rgba(244,63,94,0.45)]"
+                          : reachedLevel === 2
+                            ? "bg-[linear-gradient(90deg,#f59e0b,#fcd34d)] shadow-[0_0_12px_rgba(245,158,11,0.45)]"
+                            : "bg-[linear-gradient(90deg,#22d3ee,#34d399)] shadow-[0_0_12px_rgba(34,211,238,0.45)]";
                       const defeatedPercent = progress?.progressPercent ?? 0;
                       const remainingPercent = 100 - defeatedPercent;
 
